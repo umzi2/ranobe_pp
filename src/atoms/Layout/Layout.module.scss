@@ -1,0 +1,23 @@
+.portalContainer {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%; // Убедись, что у родителя есть высота
+  overflow: hidden;
+  border-radius: 16px;
+
+  .toolbar {
+    flex: 0 0 auto; // Не сжимается и не растет
+    padding: 8px;
+    z-index: 10;
+    background-color:blue;
+    /* border-bottom: 1px solid #ddd; */
+  }
+
+  .content {
+    flex: 1 1 auto; // Занимает всё оставшееся место
+    overflow-y: auto; // Добавляет скролл только контенту
+    position: relative;
+    background-color:red;
+  }
+}

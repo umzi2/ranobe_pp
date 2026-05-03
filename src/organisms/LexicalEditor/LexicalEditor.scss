@@ -1,0 +1,43 @@
+.mb-1 {
+  [data-lexical-text="true"] {
+    --u: ; 
+    --s: ;
+
+    text-decoration: var(--u) var(--s); 
+
+    &.lx-bold { font-weight: bold; }
+    &.lx-italic { font-style: italic; }
+
+    &.lx-underline { --u: underline; }
+    &.lx-strike { --s: line-through; }
+    
+  }
+}
+.Lexica {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent; 
+
+  .portal {
+    width: calc(100% - 24px); 
+    height: calc(100% - 24px);
+    
+    border-radius: 24px; 
+    overflow: hidden;   
+    
+    display: flex;
+    flex-direction: column;
+    position: relative;
+
+  }
+
+  .Lexica_2 {
+
+    padding: 16px; 
+    outline: none;
+    min-height: 100%;
+  }
+}
