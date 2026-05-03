@@ -1,6 +1,6 @@
 @use "~/styles/variables" as *;
 
-// Appended to <body> — scoped by class name only
+// Appended to <body> via vanilla JS — must be plain global CSS, NOT CSS Modules
 .block-drag-handle {
   width: 24px;
   height: 24px;
@@ -16,21 +16,13 @@
     background: transparent;
     color: $color-text-muted;
     cursor: grab;
-    transition: background $transition-fast, color $transition-fast, opacity $transition-fast;
-    opacity: 0;
+    transition: background $transition-fast, color $transition-fast;
 
-    &:active {
-      cursor: grabbing;
-    }
+    &:active { cursor: grabbing; }
 
     &:hover {
       background: rgba($color-text, 0.06);
       color: $color-text;
     }
-  }
-
-  // revealed when parent .block-drag-handle is shown
-  &[style*="flex"] .bdh-grip {
-    opacity: 1;
   }
 }

@@ -31,7 +31,7 @@ export function useDraggableBlockPlugin(
     let overHandle = false;
     let hideTimer: ReturnType<typeof setTimeout> | null = null;
 
-    // ── Helpers ─────────────────────────────────────────────────────────────
+    // ── Helpers ──────────────────────────────────────────────────────────────
     const getBlockKeys = (): string[] =>
       editor.getEditorState().read(() => $getRoot().getChildrenKeys());
 
@@ -52,8 +52,10 @@ export function useDraggableBlockPlugin(
       hoveredKey = key;
       const er = editorElem.getBoundingClientRect();
       const br = blockElem.getBoundingClientRect();
+      // Position handle inside the editor's left padding area:
+      // editor left edge + 6px gap → handle is fully within the container
       handle.style.top  = `${br.top + br.height / 2 - 12}px`;
-      handle.style.left = `${er.left - 30}px`;
+      handle.style.left = `${er.left + 6}px`;
       handle.style.display = "flex";
     }
 
@@ -68,7 +70,7 @@ export function useDraggableBlockPlugin(
       }, 200);
     }
 
-    // ── Mouse events on editor ───────────────────────────────────────────────
+    // ── Mouse events on editor ────────────────────────────────────────────────
     const onMouseMove = (e: MouseEvent) => {
       const block = findBlock(e.clientY);
       if (block) showHandle(block.elem, block.key);
@@ -77,7 +79,7 @@ export function useDraggableBlockPlugin(
 
     const onMouseLeave = () => scheduleHide();
 
-    // ── DragOver / Drop ──────────────────────────────────────────────────────
+    // ── DragOver / Drop ───────────────────────────────────────────────────────
     const onDragOver = (e: DragEvent) => {
       e.preventDefault();
       if (!draggingKey) return;
@@ -92,9 +94,9 @@ export function useDraggableBlockPlugin(
       const br = block.elem.getBoundingClientRect();
       const above = e.clientY < br.top + br.height / 2;
 
-      dropLine.style.top   = `${(above ? br.top : br.bottom) - 1}px`;
-      dropLine.style.left  = `${er.left + 6}px`;
-      dropLine.style.width = `${er.width - 12}px`;
+      dropLine.style.top    = `${(above ? br.top : br.bottom) - 1}px`;
+      dropLine.style.left   = `${er.left + 6}px`;
+      dropLine.style.width  = `${er.width - 12}px`;
       dropLine.style.display = "block";
     };
 
@@ -121,7 +123,7 @@ export function useDraggableBlockPlugin(
       });
     };
 
-    // ── Handle hover guard ───────────────────────────────────────────────────
+    // ── Handle hover guard ────────────────────────────────────────────────────
     handle.addEventListener("mouseenter", () => {
       overHandle = true;
       if (hideTimer) { clearTimeout(hideTimer); hideTimer = null; }
@@ -131,7 +133,7 @@ export function useDraggableBlockPlugin(
       scheduleHide();
     });
 
-    // ── Drag events on grip ──────────────────────────────────────────────────
+    // ── Drag events on grip ───────────────────────────────────────────────────
     dragBtn.addEventListener("dragstart", (e: DragEvent) => {
       if (!hoveredKey) { e.preventDefault(); return; }
       draggingKey = hoveredKey;

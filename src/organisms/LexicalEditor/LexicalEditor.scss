@@ -1,184 +1,85 @@
 @use "~/styles/variables" as *;
-/* // ─── Typography vars ─────────────────────────────────────────────────────────
-$font-body   : 'Georgia', 'Times New Roman', serif;
-$font-ui     : -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-$color-text  : #E6E6E6;
-$color-muted : #9b9b9b;
-$color-hover : rgba(0, 0, 0, 0.04);
-$color-blue  : #2383e2; */
 
-// ─── Outer shell ─────────────────────────────────────────────────────────────
+// ── Global styles for vanilla-JS DOM elements & string-class JSX components ──
+// These MUST be plain .scss (not .module.scss) so class names aren't hashed.
+@use "../../atoms/ToggleButton/ToggleButton" as *;
+@use "../../atoms/Tooltip/Tooltip" as *;
+@use "../../molecules/BlockDragHandle/BlockDragHandle" as *;
+@use "../../molecules/BlockInsertLine/BlockInsertLine" as *;
+
+// ── Editor shell ──────────────────────────────────────────────────────────────
 .Lexica {
   width: 100%;
   height: 100%;
   background: $color-bg-elevated;
   overflow-y: auto;
-  position: relative; // stacking context
+  position: relative;
 
-  // ─── The contenteditable ────────────────────────────────────────────────
+  // padding-left = handle_width(24) + left_offset(8) + inner_gap(8) = 40px
+  // Handle sits at er.left + 6px, so it stays inside the editor container.
   &_editor {
-    // wide left padding = room for the floating handle at +14px
-    padding: 48px 80px 120px 72px;
-    max-width: 780px;
+    padding: 36px 56px 120px 40px;
+    max-width: 760px;
     margin: 0 auto;
     min-height: 100%;
     outline: none;
-    /* font-family: $font-body; */
-    font-size: 16px;
+    font-family: $font-family;
+    font-size: $text-md;
     line-height: 1.75;
-    /* color: $color-text; */
-    /* caret-color: $color-blue; */
+    color: $color-text;
+    caret-color: $color-accent;
     word-break: break-word;
 
-    // ── Placeholder (when only one empty paragraph) ──────────────────────
-    p:only-child:empty::before,
-    p.is-empty::before {
+    p:only-child:empty::before {
       content: attr(data-placeholder);
-      /* color: $color-muted; */
+      color: $color-text-muted;
       pointer-events: none;
       font-style: italic;
     }
   }
 }
 
-// ─── Paragraph block ─────────────────────────────────────────────────────────
+// ── Paragraph / block ─────────────────────────────────────────────────────────
 .mb-1 {
-  margin: 2px 0;
+  margin: 1px 0;
   padding: 2px 4px;
-  border-radius: 3px;
-  transition: background 80ms ease;
+  border-radius: $radius-sm;
+  transition: background $transition-fast;
   position: relative;
 
   &:hover {
-    /* background: $color-hover; */
-  }
-
-  // Placeholder on empty focused paragraph
-  &:empty:focus::before {
-    content: "Type '/' for commands…";
-    /* color: $color-muted; */
-    pointer-events: none;
-    font-style: italic;
-    position: absolute;
-    left: 4px;
+    background: rgba($color-text, 0.03);
   }
 }
 
-// ─── Inline text formats ──────────────────────────────────────────────────────
+// ── Inline text formats ───────────────────────────────────────────────────────
 [data-lexical-text="true"] {
   --u: ;
   --s: ;
   text-decoration: var(--u) var(--s);
 
-  &.lx-bold      { font-weight: 700; }
+  &.lx-bold      { font-weight: $fw-bold; }
   &.lx-italic    { font-style: italic; }
   &.lx-underline { --u: underline; }
-  &.lx-strike    { --s: line-through; }
+  &.lx-strike    { --s: line-through; color: $color-text-muted; }
 }
 
-// ─── Toolbar ─────────────────────────────────────────────────────────────────
-.editor-toolbar {
-  display: flex;
-  align-items: center;
-  gap: 2px;
-  padding: 4px 8px;
-  /* font-family: $font-ui; */
-}
+// ── Drag drop indicator line (appended to <body> by useDraggableBlock) ────────
+.drag-drop-line {
+  background: $color-accent;
+  border-radius: 2px;
+  box-shadow: 0 0 0 2px rgba($color-accent, 0.2);
 
-.editor-toggle-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  border: none;
-  border-radius: 5px;
-  background: transparent;
-  color:$color-text;
-  cursor: pointer;
-  transition: background 100ms, color 100ms;
-
-  svg { display: block; }
-
-  &:hover {
-    background: rgba(0, 0, 0, 0.07);
-    color: #111;
-  }
-
-  &.pressed,
-  &[aria-pressed="true"] {
-    background: rgba(35, 131, 226, 0.12);
-    /* color: $color-blue; */
-  }
-}
-
-.editor-tooltip-wrapper {
-  position: relative;
-  display: inline-flex;
-}
-
-.editor-tooltip-popup {
-  position: absolute;
-  bottom: calc(100% + 6px);
-  left: 50%;
-  transform: translateX(-50%);
-  background: #1a1a1a;
-  /* color: $color-bg-elevated; */
-  /* font-family: $font-ui; */
-  font-size: 11px;
-  padding: 3px 7px;
-  border-radius: 4px;
-  white-space: nowrap;
-  pointer-events: none;
-  z-index: 100;
-}
-
-// ─── Floating block handle (appended to <body>) ───────────────────────────────
-.nbc-handle {
-  // base styles set inline in JS; class handles appearance only
-  pointer-events: auto;
-
-  .nbc-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 22px;
-    height: 22px;
-    border: none;
-    border-radius: 4px;
-    background: transparent;
-    color: #bbb;
-    cursor: pointer;
-    padding: 0;
-    transition: background 80ms, color 80ms;
-    /* font-family: $font-ui; */
-    line-height: 1;
-
-    &:hover {
-      background: rgba(0, 0, 0, 0.07);
-      color: #555;
-    }
-  }
-
-  .nbc-drag {
-    cursor: grab;
-    &:active { cursor: grabbing; }
-  }
-}
-
-// Drop indicator line (appended to <body>)
-.nbc-drop-line {
-  transition: opacity 80ms;
   &::before,
   &::after {
-    content: '';
+    content: "";
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
     width: 6px;
     height: 6px;
     border-radius: 50%;
-    /* background: $color-blue; */
+    background: $color-accent;
   }
   &::before { left: -3px; }
   &::after  { right: -3px; }

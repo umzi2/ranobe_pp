@@ -1,5 +1,6 @@
 @use "~/styles/variables" as *;
 
+// Used as a global class string in JSX — must NOT be a CSS Module
 .tooltip-wrapper {
   position: relative;
   display: inline-flex;
@@ -10,7 +11,7 @@
   bottom: calc(100% + 6px);
   left: 50%;
   transform: translateX(-50%);
-  background: darken(#1B1F2A, 4%);
+  background: #111520;
   color: $color-text;
   font-size: $text-xs;
   font-family: $font-family;
