@@ -1,0 +1,36 @@
+@use "~/styles/variables" as *;
+
+// Appended to <body> — scoped by class name only
+.block-drag-handle {
+  width: 24px;
+  height: 24px;
+  pointer-events: auto;
+
+  .bdh-grip {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: $radius-sm;
+    background: transparent;
+    color: $color-text-muted;
+    cursor: grab;
+    transition: background $transition-fast, color $transition-fast, opacity $transition-fast;
+    opacity: 0;
+
+    &:active {
+      cursor: grabbing;
+    }
+
+    &:hover {
+      background: rgba($color-text, 0.06);
+      color: $color-text;
+    }
+  }
+
+  // revealed when parent .block-drag-handle is shown
+  &[style*="flex"] .bdh-grip {
+    opacity: 1;
+  }
+}

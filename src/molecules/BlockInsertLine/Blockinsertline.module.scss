@@ -1,0 +1,68 @@
+@use "~/styles/variables" as *;
+
+// Appended to <body>
+.block-insert-line {
+  // layout set inline by JS
+
+  .bil-track {
+    position: relative;
+    width: 100%;
+    height: 2px;
+    border-radius: 2px;
+    background: $color-accent;
+    opacity: 0;
+    transition: opacity $transition-fast;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    // dots at each end
+    &::before,
+    &::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: $color-accent;
+    }
+    &::before { left: -3px; }
+    &::after  { right: -3px; }
+  }
+
+  // show the track when line is visible (display: flex)
+  &[style*="flex"] .bil-track {
+    opacity: 1;
+  }
+
+  .bil-btn {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 1.5px solid $color-accent;
+    background: $color-bg-elevated;
+    color: $color-accent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0;
+    transition: background $transition-fast, transform $transition-fast, box-shadow $transition-fast;
+    box-shadow: 0 0 0 2px $color-bg-elevated;
+
+    svg { display: block; flex-shrink: 0; }
+
+    &:hover {
+      background: $color-accent;
+      color: #fff;
+      transform: translate(-50%, -50%) scale(1.15);
+      box-shadow: 0 0 0 2px $color-bg-elevated, 0 2px 8px rgba($color-accent, 0.4);
+    }
+  }
+}

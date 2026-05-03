@@ -1,0 +1,24 @@
+@use "~/styles/variables" as *;
+
+.tooltip-wrapper {
+  position: relative;
+  display: inline-flex;
+}
+
+.tooltip-popup {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: darken(#1B1F2A, 4%);
+  color: $color-text;
+  font-size: $text-xs;
+  font-family: $font-family;
+  padding: 3px 8px;
+  border-radius: $radius-sm;
+  border: 1px solid $color-border;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 200;
+  box-shadow: $shadow-md;
+}
