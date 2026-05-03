@@ -1,4 +1,4 @@
-import "./Blockdraghandle.module.scss"
+// import "./Blockdraghandle.module.scss"
 export interface DragHandleElements {
   handle: HTMLElement;
   dragBtn: HTMLElement;
