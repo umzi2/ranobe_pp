@@ -1,7 +1,8 @@
 import { $getSelection, $isRangeSelection, FORMAT_TEXT_COMMAND, mergeRegister } from "lexical";
 import { Component, createSignal, For, JSXElement, onCleanup, onMount, ParentComponent, splitProps } from "solid-js";
 import { useEditor } from "~/molecules/LexicalEditor/useEditor";
-import { TbOutlineBold as IconBold, TbOutlineItalic as IconItalic, TbOutlineStrikethrough as IconStrikethrough,TbOutlineUnderline as IconUnderline } from 'solid-icons/tb'
+import { TbOutlineBold as IconBold, TbOutlineItalic as IconItalic, TbOutlineStrikethrough as IconStrikethrough, TbOutlineUnderline as IconUnderline } from 'solid-icons/tb'
+import "./LexicalToolbar.scss"
 interface Action {
   label: string;
   icon: JSXElement;
