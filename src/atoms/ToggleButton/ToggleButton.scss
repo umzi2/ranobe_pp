@@ -15,12 +15,10 @@
         color $transition-fast;
 
     &:hover {
-        background: rgba($color-text, 0.08);
         color: $color-text;
     }
 
     &.pressed {
-        background: rgba($color-accent, 0.15);
         color: $color-accent;
     }
 

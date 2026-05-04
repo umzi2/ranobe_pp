@@ -10,7 +10,6 @@
     position: relative;
 
     &_editor {
-        // symmetric: left = right = 36px. Left side holds drag handle in its padding.
         padding: 28px 36px 80px 36px;
         max-width: 760px;
         margin: 0 auto;
@@ -22,6 +21,14 @@
         color: $color-text;
         caret-color: $color-accent;
         word-break: break-word;
+
+        // Kill any browser default focus/hover artifacts
+        *:focus {
+            outline: none;
+        }
+        *:hover {
+            outline: none;
+        }
 
         p:only-child:empty::before {
             content: attr(data-placeholder);
@@ -38,17 +45,17 @@
     padding: 1px 4px;
     border-radius: $radius-sm;
     line-height: 1.5;
-    transition: background $transition-fast;
-    position: relative;
+    background: transparent;
+}
 
-    &:hover {
-        background: rgba($color-text, 0.03);
-    }
+.editor-paragraph:hover,
+.editor-paragraph:focus,
+.editor-paragraph:focus-within {
+    background: transparent;
+    outline: none;
 }
 
 // ── Headings ──────────────────────────────────────────────────────────────────
-// Each heading class is applied by Lexical via config.theme.heading.h*
-// line-height is explicit to prevent font-size jumps from affecting layout.
 .lx-h1,
 .lx-h2,
 .lx-h3 {
@@ -56,12 +63,21 @@
     border-radius: $radius-sm;
     font-weight: $fw-semibold;
     color: $color-text;
-    transition: background $transition-fast;
     margin: 4px 0 0;
+    background: transparent;
+}
 
-    &:hover {
-        background: rgba($color-text, 0.03);
-    }
+.lx-h1:hover,
+.lx-h1:focus,
+.lx-h1:focus-within,
+.lx-h2:hover,
+.lx-h2:focus,
+.lx-h2:focus-within,
+.lx-h3:hover,
+.lx-h3:focus,
+.lx-h3:focus-within {
+    background: transparent;
+    outline: none;
 }
 
 .lx-h1 {
@@ -118,17 +134,28 @@
     text-align: justify;
 }
 
+// ── Horizontal rule ───────────────────────────────────────────────────────────
+.lx-hr {
+    all: unset;
+    display: block;
+    height: 1px;
+    background: $color-border;
+    margin: 16px 4px;
+    border: none;
+    opacity: 0.6;
+
+    &:hover {
+        background: $color-accent;
+        opacity: 0.8;
+    }
+}
+
 // ── Image node ────────────────────────────────────────────────────────────────
 .lx-image-wrapper {
     margin: 6px 0;
     border-radius: $radius-md;
     overflow: hidden;
     user-select: none;
-
-    &.lx-image-selected {
-        outline: 2px solid $color-accent;
-        outline-offset: 2px;
-    }
 }
 
 .lx-image {
@@ -261,22 +288,17 @@
     color: $color-text-muted;
     cursor: pointer;
     font-size: $text-sm;
-    transition:
-        background $transition-fast,
-        color $transition-fast;
+    transition: color $transition-fast;
 
     &:hover {
-        background: rgba($color-text, 0.08);
         color: $color-text;
     }
 
     &.pressed {
-        background: rgba($color-accent, 0.15);
         color: $color-accent;
     }
 
     &.lx-itb-del:hover {
-        background: rgba($color-danger, 0.15);
         color: $color-danger;
     }
 }

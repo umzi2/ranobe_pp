@@ -6,11 +6,19 @@ import {
 } from "lexical";
 import { HeadingNode } from "@lexical/rich-text";
 import { ImageNode } from "./src/organisms/LexicalEditor/nodes/ImageNode";
+import { HorizontalRuleNode } from "./src/organisms/LexicalEditor/nodes/HorizontalRuleNode";
 
 export const COMMENTS_EDITOR_CONFIG: CreateEditorArgs = {
   namespace: "CommentsEditor",
   onError: (e: Error) => console.error(e),
-  nodes: [RootNode, ParagraphNode, TextNode, HeadingNode, ImageNode],
+  nodes: [
+    RootNode,
+    ParagraphNode,
+    TextNode,
+    HeadingNode,
+    ImageNode,
+    HorizontalRuleNode,
+  ],
   theme: {
     paragraph: "editor-paragraph",
     heading: {

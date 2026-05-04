@@ -4,6 +4,7 @@ import { useRichTextPlugin } from "./plugins/useRichTextPlugin";
 import { useDraggableBlockPlugin } from "./plugins/useDraggableBlock";
 import { onMount, onCleanup } from "solid-js";
 import { $isImageNode } from "./nodes/ImageNode";
+import { $isHorizontalRuleNode } from "./nodes/HorizontalRuleNode";
 import "./LexicalEditor.scss";
 
 export function LexicalEditor() {
@@ -27,7 +28,9 @@ export function LexicalEditor() {
         });
 
         if ($isNodeSelection(sel)) {
-          const imgNode = sel.getNodes().find($isImageNode);
+          const nodes = sel.getNodes();
+          const imgNode = nodes.find($isImageNode);
+          const hrNode = nodes.find($isHorizontalRuleNode);
           if (imgNode) {
             // Find the corresponding figure by traversing the editor DOM
             const figures =
@@ -50,6 +53,13 @@ export function LexicalEditor() {
                   break;
                 }
               }
+            }
+          } else if (hrNode) {
+            // Handle HR selection
+            const hrs = editorRef?.querySelectorAll("hr.lx-hr") ?? [];
+            for (const hr of hrs) {
+              hr.classList.add("lx-image-selected");
+              break;
             }
           }
         }

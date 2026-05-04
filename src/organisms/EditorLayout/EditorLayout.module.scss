@@ -5,12 +5,8 @@
     flex-direction: column;
     width: 100%;
     height: 100%;
-    // overflow:hidden clips child backgrounds to the rounded corners.
-    // It does NOT clip position:fixed descendants (they're viewport-relative).
     overflow: hidden;
     border-radius: $radius-xl;
-    border: 1px solid $color-border;
-    box-shadow: $shadow-xl;
     background: $color-bg-elevated;
 
     .toolbar {

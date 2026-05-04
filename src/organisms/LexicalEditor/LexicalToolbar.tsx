@@ -34,10 +34,12 @@ import {
   TbOutlineAlignRight as IconAlignRight,
   TbOutlineAlignJustified as IconAlignJustify,
   TbOutlinePhoto as IconImage,
+  TbOutlineSeparatorHorizontal as IconHr,
 } from "solid-icons/tb";
 import { ToggleButton } from "~/atoms/ToggleButton/ToggleButton";
 import { Tooltip } from "~/atoms/Tooltip/Tooltip";
 import { $createImageNode, $isImageNode } from "./nodes/ImageNode";
+import { $createHorizontalRuleNode } from "./nodes/HorizontalRuleNode";
 import "./LexicalToolbar.scss";
 
 type Alignment = "left" | "center" | "right" | "justify";
@@ -133,6 +135,23 @@ export const Toolbar: Component = () => {
       } else {
         $setBlocksType(sel, () => $createHeadingNode(tag));
       }
+    });
+  }
+
+  function insertHorizontalRule() {
+    editor.update(() => {
+      const sel = $getSelection();
+      if (!$isRangeSelection(sel)) return;
+      const anchor = sel.anchor.getNode();
+      const element =
+        anchor.getKey() === "root"
+          ? anchor
+          : anchor.getTopLevelElementOrThrow();
+      const hr = $createHorizontalRuleNode();
+      const para = $createParagraphNode();
+      element.insertAfter(hr);
+      hr.insertAfter(para);
+      para.select();
     });
   }
 
@@ -252,7 +271,19 @@ export const Toolbar: Component = () => {
 
       <div class="toolbar-divider" />
 
-      {/* ── Image by URL ── */}
+      {/* ── Horizontal rule ── */}
+      <Tooltip content="Разделитель">
+        <ToggleButton
+          pressed={false}
+          onChange={insertHorizontalRule}
+          aria-label="Horizontal rule"
+        >
+          <IconHr />
+        </ToggleButton>
+      </Tooltip>
+
+      <div class="toolbar-divider" />
+
       <div class="toolbar-img-group">
         <Tooltip content="Вставить изображение">
           <ToggleButton
