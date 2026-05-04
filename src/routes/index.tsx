@@ -1,20 +1,24 @@
-import { EditorProvider } from "~/molecules/LexicalEditor/useEditor";
+import { EditorProvider } from "~/molecules/EditorContext/EditorContext";
+import { EditorTemplate } from "~/templates/EditorTemplate";
 import { LexicalEditor } from "~/organisms/LexicalEditor/LexicalEditor";
-import { COMMENTS_EDITOR_CONFIG } from "../../config";
-import { Layout } from "~/atoms/Layout/Layout";
+import { EditorLayout } from "~/organisms/EditorLayout/EditorLayout";
 import { Toolbar } from "~/organisms/LexicalEditor/LexicalToolbar";
-import "./index.scss"
+import { NoSSR } from "~/atoms/NoSSR/NoSSR";
+import { COMMENTS_EDITOR_CONFIG } from "../../config";
+import "./index.scss";
+
 export default function StartPage() {
-  return (<div class="rrrr"  >
-    
-    <EditorProvider config={COMMENTS_EDITOR_CONFIG}>
-      <Layout toolbar=<Toolbar/>>
-        <LexicalEditor></LexicalEditor>
-      </Layout>
-      </EditorProvider>
-    
-  </div>
-    
-    
+  return (
+    <EditorTemplate>
+      <div class="editor-page">
+        <NoSSR>
+          <EditorProvider config={COMMENTS_EDITOR_CONFIG}>
+            <EditorLayout toolbar={<Toolbar />}>
+              <LexicalEditor />
+            </EditorLayout>
+          </EditorProvider>
+        </NoSSR>
+      </div>
+    </EditorTemplate>
   );
 }

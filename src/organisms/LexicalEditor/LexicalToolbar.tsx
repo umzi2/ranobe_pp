@@ -1,6 +1,7 @@
 import {
   $getSelection,
   $isRangeSelection,
+  $isNodeSelection,
   $createParagraphNode,
   FORMAT_TEXT_COMMAND,
   FORMAT_ELEMENT_COMMAND,
@@ -13,22 +14,30 @@ import {
   HeadingTagType,
 } from "@lexical/rich-text";
 import { $setBlocksType } from "@lexical/selection";
-import { Component, createSignal, For, JSXElement, onCleanup, onMount, Show } from "solid-js";
-import { useEditor } from "~/molecules/LexicalEditor/useEditor";
 import {
-  TbOutlineBold           as IconBold,
-  TbOutlineItalic         as IconItalic,
-  TbOutlineStrikethrough  as IconStrike,
-  TbOutlineUnderline      as IconUnderline,
-  TbOutlineAlignLeft      as IconAlignLeft,
-  TbOutlineAlignCenter    as IconAlignCenter,
-  TbOutlineAlignRight     as IconAlignRight,
+  Component,
+  createSignal,
+  For,
+  JSXElement,
+  onCleanup,
+  onMount,
+  Show,
+} from "solid-js";
+import { useEditor } from "~/molecules/EditorContext/EditorContext";
+import {
+  TbOutlineBold as IconBold,
+  TbOutlineItalic as IconItalic,
+  TbOutlineStrikethrough as IconStrike,
+  TbOutlineUnderline as IconUnderline,
+  TbOutlineAlignLeft as IconAlignLeft,
+  TbOutlineAlignCenter as IconAlignCenter,
+  TbOutlineAlignRight as IconAlignRight,
   TbOutlineAlignJustified as IconAlignJustify,
-  TbOutlinePhoto          as IconImage,
+  TbOutlinePhoto as IconImage,
 } from "solid-icons/tb";
 import { ToggleButton } from "~/atoms/ToggleButton/ToggleButton";
-import { Tooltip }      from "~/atoms/Tooltip/Tooltip";
-import { $createImageNode } from "./nodes/ImageNode";
+import { Tooltip } from "~/atoms/Tooltip/Tooltip";
+import { $createImageNode, $isImageNode } from "./nodes/ImageNode";
 import "./LexicalToolbar.scss";
 
 type Alignment = "left" | "center" | "right" | "justify";
@@ -49,20 +58,32 @@ interface AlignAction {
 export const Toolbar: Component = () => {
   const editor = useEditor();
 
-  const [isBold,          setIsBold]          = createSignal(false);
-  const [isItalic,        setIsItalic]        = createSignal(false);
-  const [isUnderline,     setIsUnderline]     = createSignal(false);
+  const [isBold, setIsBold] = createSignal(false);
+  const [isItalic, setIsItalic] = createSignal(false);
+  const [isUnderline, setIsUnderline] = createSignal(false);
   const [isStrikethrough, setIsStrikethrough] = createSignal(false);
-  const [alignment,       setAlignment]       = createSignal<Alignment>("left");
-  const [blockType,       setBlockType]       = createSignal<BlockType>("paragraph");
-  const [showImgInput,    setShowImgInput]    = createSignal(false);
-  const [imgUrl,          setImgUrl]          = createSignal("");
+  const [alignment, setAlignment] = createSignal<Alignment>("left");
+  const [blockType, setBlockType] = createSignal<BlockType>("paragraph");
+  const [showImgInput, setShowImgInput] = createSignal(false);
+  const [imgUrl, setImgUrl] = createSignal("");
+
+  // Track whether an image is selected (for visual feedback)
+  const [hasImageSelection, setHasImageSelection] = createSignal(false);
 
   onMount(() => {
     const unregister = mergeRegister(
       editor.registerUpdateListener(({ editorState }) => {
         editorState.read(() => {
           const sel = $getSelection();
+
+          // ── Image node selection ──
+          if ($isNodeSelection(sel)) {
+            const hasImg = sel.getNodes().some($isImageNode);
+            setHasImageSelection(hasImg);
+            return;
+          }
+          setHasImageSelection(false);
+
           if (!$isRangeSelection(sel)) return;
 
           setIsBold(sel.hasFormat("bold"));
@@ -70,12 +91,15 @@ export const Toolbar: Component = () => {
           setIsUnderline(sel.hasFormat("underline"));
           setIsStrikethrough(sel.hasFormat("strikethrough"));
 
-          const anchor  = sel.anchor.getNode();
-          const element = anchor.getKey() === "root"
-            ? anchor
-            : anchor.getTopLevelElementOrThrow();
+          const anchor = sel.anchor.getNode();
+          const element =
+            anchor.getKey() === "root"
+              ? anchor
+              : anchor.getTopLevelElementOrThrow();
 
-          const fmt = (element as any).getFormatType?.() as ElementFormatType | undefined;
+          const fmt = (element as any).getFormatType?.() as
+            | ElementFormatType
+            | undefined;
           setAlignment((fmt as Alignment) || "left");
 
           if ($isHeadingNode(element)) {
@@ -84,7 +108,7 @@ export const Toolbar: Component = () => {
             setBlockType("paragraph");
           }
         });
-      })
+      }),
     );
     onCleanup(unregister);
   });
@@ -95,10 +119,11 @@ export const Toolbar: Component = () => {
       const sel = $getSelection();
       if (!$isRangeSelection(sel)) return;
 
-      const anchor  = sel.anchor.getNode();
-      const element = anchor.getKey() === "root"
-        ? anchor
-        : anchor.getTopLevelElementOrThrow();
+      const anchor = sel.anchor.getNode();
+      const element =
+        anchor.getKey() === "root"
+          ? anchor
+          : anchor.getTopLevelElementOrThrow();
 
       const isAlreadyThis = $isHeadingNode(element) && element.getTag() === tag;
 
@@ -117,9 +142,9 @@ export const Toolbar: Component = () => {
     editor.update(() => {
       const sel = $getSelection();
       if (!$isRangeSelection(sel)) return;
-      const anchor  = sel.anchor.getNode();
+      const anchor = sel.anchor.getNode();
       const element = anchor.getTopLevelElementOrThrow();
-      const img  = $createImageNode(url);
+      const img = $createImageNode(url);
       const para = $createParagraphNode();
       element.insertAfter(img);
       img.insertAfter(para);
@@ -129,18 +154,41 @@ export const Toolbar: Component = () => {
     setShowImgInput(false);
   }
 
+  // (delete is handled in the inline block toolbar)
+
   const textActions: TextAction[] = [
-    { label: "Жирный",        icon: <IconBold />,        pressed: isBold,          onChange: () => editor.dispatchCommand(FORMAT_TEXT_COMMAND, "bold")          },
-    { label: "Курсив",        icon: <IconItalic />,      pressed: isItalic,        onChange: () => editor.dispatchCommand(FORMAT_TEXT_COMMAND, "italic")        },
-    { label: "Подчёркивание", icon: <IconUnderline />,   pressed: isUnderline,     onChange: () => editor.dispatchCommand(FORMAT_TEXT_COMMAND, "underline")     },
-    { label: "Зачёркнутый",  icon: <IconStrike />,      pressed: isStrikethrough, onChange: () => editor.dispatchCommand(FORMAT_TEXT_COMMAND, "strikethrough") },
+    {
+      label: "Жирный",
+      icon: <IconBold />,
+      pressed: isBold,
+      onChange: () => editor.dispatchCommand(FORMAT_TEXT_COMMAND, "bold"),
+    },
+    {
+      label: "Курсив",
+      icon: <IconItalic />,
+      pressed: isItalic,
+      onChange: () => editor.dispatchCommand(FORMAT_TEXT_COMMAND, "italic"),
+    },
+    {
+      label: "Подчёркивание",
+      icon: <IconUnderline />,
+      pressed: isUnderline,
+      onChange: () => editor.dispatchCommand(FORMAT_TEXT_COMMAND, "underline"),
+    },
+    {
+      label: "Зачёркнутый",
+      icon: <IconStrike />,
+      pressed: isStrikethrough,
+      onChange: () =>
+        editor.dispatchCommand(FORMAT_TEXT_COMMAND, "strikethrough"),
+    },
   ];
 
   const alignActions: AlignAction[] = [
-    { label: "По левому краю",  icon: <IconAlignLeft />,    value: "left"    },
-    { label: "По центру",       icon: <IconAlignCenter />,  value: "center"  },
-    { label: "По правому краю", icon: <IconAlignRight />,   value: "right"   },
-    { label: "По ширине",       icon: <IconAlignJustify />, value: "justify" },
+    { label: "По левому краю", icon: <IconAlignLeft />, value: "left" },
+    { label: "По центру", icon: <IconAlignCenter />, value: "center" },
+    { label: "По правому краю", icon: <IconAlignRight />, value: "right" },
+    { label: "По ширине", icon: <IconAlignJustify />, value: "justify" },
   ];
 
   const headings: { tag: HeadingTagType; label: string }[] = [
@@ -151,7 +199,6 @@ export const Toolbar: Component = () => {
 
   return (
     <div class="editor-toolbar">
-
       {/* ── Headings ── */}
       <For each={headings}>
         {(h) => (
@@ -173,7 +220,11 @@ export const Toolbar: Component = () => {
       <For each={textActions}>
         {(a) => (
           <Tooltip content={a.label}>
-            <ToggleButton pressed={a.pressed()} onChange={a.onChange} aria-label={a.label}>
+            <ToggleButton
+              pressed={a.pressed()}
+              onChange={a.onChange}
+              aria-label={a.label}
+            >
               {a.icon}
             </ToggleButton>
           </Tooltip>
@@ -188,7 +239,9 @@ export const Toolbar: Component = () => {
           <Tooltip content={a.label}>
             <ToggleButton
               pressed={alignment() === a.value}
-              onChange={() => editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, a.value)}
+              onChange={() =>
+                editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, a.value)
+              }
               aria-label={a.label}
             >
               {a.icon}
@@ -204,12 +257,24 @@ export const Toolbar: Component = () => {
         <Tooltip content="Вставить изображение">
           <ToggleButton
             pressed={showImgInput()}
-            onChange={(v) => { setShowImgInput(v); if (!v) setImgUrl(""); }}
+            onChange={(v) => {
+              setShowImgInput(v);
+              if (!v) setImgUrl("");
+            }}
             aria-label="Image"
           >
             <IconImage />
           </ToggleButton>
         </Tooltip>
+
+        <Show when={hasImageSelection()}>
+          <span
+            class="toolbar-label"
+            style="color: $color-text-muted; font-size: 10px;"
+          >
+            🖼 изображение
+          </span>
+        </Show>
 
         <Show when={showImgInput()}>
           <div class="toolbar-img-popover">
@@ -220,8 +285,11 @@ export const Toolbar: Component = () => {
               value={imgUrl()}
               onInput={(e) => setImgUrl(e.currentTarget.value)}
               onKeyDown={(e) => {
-                if (e.key === "Enter")  insertImage();
-                if (e.key === "Escape") { setShowImgInput(false); setImgUrl(""); }
+                if (e.key === "Enter") insertImage();
+                if (e.key === "Escape") {
+                  setShowImgInput(false);
+                  setImgUrl("");
+                }
               }}
               ref={(el) => requestAnimationFrame(() => el?.focus())}
             />
@@ -230,11 +298,12 @@ export const Toolbar: Component = () => {
               type="button"
               disabled={!imgUrl().trim()}
               onClick={insertImage}
-            >↵</button>
+            >
+              ↵
+            </button>
           </div>
         </Show>
       </div>
-
     </div>
   );
 };

@@ -1,28 +1,38 @@
 @use "~/styles/variables" as *;
 
-// Appended to <body> via vanilla JS — must be plain global CSS, NOT CSS Modules
+// Appended to <body> — position:fixed, moved via JS
 .block-drag-handle {
-  width: 24px;
-  height: 24px;
-  pointer-events: auto;
-
-  .bdh-grip {
-    display: flex;
+    position: fixed;
+    display: none; // shown by JS via .show()
     align-items: center;
     justify-content: center;
     width: 24px;
     height: 24px;
-    border-radius: $radius-sm;
-    background: transparent;
-    color: $color-text-muted;
-    cursor: grab;
-    transition: background $transition-fast, color $transition-fast;
+    z-index: 9999;
+    user-select: none;
+    pointer-events: auto;
 
-    &:active { cursor: grabbing; }
+    .bdh-grip {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 24px;
+        height: 24px;
+        border-radius: $radius-sm;
+        background: transparent;
+        color: $color-text-muted;
+        cursor: grab;
+        transition:
+            background $transition-fast,
+            color $transition-fast;
 
-    &:hover {
-      background: rgba($color-text, 0.06);
-      color: $color-text;
+        &:active {
+            cursor: grabbing;
+        }
+
+        &:hover {
+            background: rgba($color-text, 0.06);
+            color: $color-text;
+        }
     }
-  }
 }

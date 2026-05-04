@@ -1,32 +1,32 @@
 @use "~/styles/variables" as *;
 
 .editor-toggle-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  border: none;
-  border-radius: $radius-sm;
-  background: transparent;
-  color: $color-text-muted;
-  cursor: pointer;
-  transition: background $transition-fast, color $transition-fast;
-  flex-shrink: 0;
+    all: unset;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: $radius-sm;
+    color: $color-text-muted;
+    cursor: pointer;
+    transition:
+        background $transition-fast,
+        color $transition-fast;
 
-  svg {
-    display: block;
-    pointer-events: none;
-  }
+    &:hover {
+        background: rgba($color-text, 0.08);
+        color: $color-text;
+    }
 
-  &:hover {
-    background: rgba($color-text, 0.07);
-    color: $color-text;
-  }
+    &.pressed {
+        background: rgba($color-accent, 0.15);
+        color: $color-accent;
+    }
 
-  &.pressed,
-  &[aria-pressed="true"] {
-    background: rgba($color-accent, 0.15);
-    color: $color-accent;
-  }
+    svg {
+        width: 18px;
+        height: 18px;
+        flex-shrink: 0;
+    }
 }

@@ -1,4 +1,5 @@
 import { JSXElement, splitProps } from "solid-js";
+import "./ToggleButton.scss";
 
 export interface ToggleButtonProps {
   pressed: boolean;
@@ -9,7 +10,12 @@ export interface ToggleButtonProps {
 }
 
 export function ToggleButton(props: ToggleButtonProps) {
-  const [local, rest] = splitProps(props, ["pressed", "onChange", "children", "class"]);
+  const [local, rest] = splitProps(props, [
+    "pressed",
+    "onChange",
+    "children",
+    "class",
+  ]);
 
   return (
     <button

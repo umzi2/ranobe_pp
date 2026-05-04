@@ -8,6 +8,7 @@
     "preview": "vinxi preview"
   },
   "dependencies": {
+    "@kobalte/core": "^0.13.11",
     "@lexical/rich-text": "^0.44.0",
     "@lexical/text": "^0.44.0",
     "@lexical/utils": "^0.44.0",

@@ -1,4 +1,5 @@
 import { createSignal, JSXElement, ParentComponent } from "solid-js";
+import "./Tooltip.scss";
 
 interface TooltipProps {
   content: JSXElement | string;

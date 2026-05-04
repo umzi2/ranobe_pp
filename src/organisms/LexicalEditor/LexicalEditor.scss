@@ -1,50 +1,49 @@
 @use "~/styles/variables" as *;
-
-@use "../../atoms/ToggleButton/ToggleButton" as *;
-@use "../../atoms/Tooltip/Tooltip" as *;
 @use "../../molecules/BlockDragHandle/BlockDragHandle" as *;
 
 // ── Editor shell ──────────────────────────────────────────────────────────────
 .Lexica {
-  width: 100%;
-  height: 100%;
-  background: $color-bg-elevated;
-  overflow: visible; // fixed drag-handle must not be clipped
-  position: relative;
+    width: 100%;
+    height: 100%;
+    background: $color-bg-elevated;
+    overflow: visible; // fixed drag-handle must not be clipped
+    position: relative;
 
-  &_editor {
-    // symmetric: left = right = 36px. Left side holds drag handle in its padding.
-    padding: 28px 36px 80px 36px;
-    max-width: 760px;
-    margin: 0 auto;
-    min-height: 100%;
-    outline: none;
-    font-family: $font-family;
-    font-size: $text-md;
-    line-height: 1.5;
-    color: $color-text;
-    caret-color: $color-accent;
-    word-break: break-word;
+    &_editor {
+        // symmetric: left = right = 36px. Left side holds drag handle in its padding.
+        padding: 28px 36px 80px 36px;
+        max-width: 760px;
+        margin: 0 auto;
+        min-height: 100%;
+        outline: none;
+        font-family: $font-family;
+        font-size: $text-md;
+        line-height: 1.5;
+        color: $color-text;
+        caret-color: $color-accent;
+        word-break: break-word;
 
-    p:only-child:empty::before {
-      content: attr(data-placeholder);
-      color: $color-text-muted;
-      pointer-events: none;
-      font-style: italic;
+        p:only-child:empty::before {
+            content: attr(data-placeholder);
+            color: $color-text-muted;
+            pointer-events: none;
+            font-style: italic;
+        }
     }
-  }
 }
 
 // ── Paragraph ─────────────────────────────────────────────────────────────────
-.mb-1 {
-  margin: 0;
-  padding: 1px 4px;
-  border-radius: $radius-sm;
-  line-height: 1.5;
-  transition: background $transition-fast;
-  position: relative;
+.editor-paragraph {
+    margin: 0;
+    padding: 1px 4px;
+    border-radius: $radius-sm;
+    line-height: 1.5;
+    transition: background $transition-fast;
+    position: relative;
 
-  &:hover { background: rgba($color-text, 0.03); }
+    &:hover {
+        background: rgba($color-text, 0.03);
+    }
 }
 
 // ── Headings ──────────────────────────────────────────────────────────────────
@@ -53,158 +52,330 @@
 .lx-h1,
 .lx-h2,
 .lx-h3 {
-  padding: 1px 4px;
-  border-radius: $radius-sm;
-  font-weight: $fw-semibold;
-  color: $color-text;
-  transition: background $transition-fast;
-  // No margin — consistent rhythm with paragraphs.
-  // If you want breathing room before a heading, set margin-top here.
-  margin: 4px 0 0;
+    padding: 1px 4px;
+    border-radius: $radius-sm;
+    font-weight: $fw-semibold;
+    color: $color-text;
+    transition: background $transition-fast;
+    margin: 4px 0 0;
 
-  &:hover { background: rgba($color-text, 0.03); }
+    &:hover {
+        background: rgba($color-text, 0.03);
+    }
 }
 
-.lx-h1 { font-size: 1.6rem; line-height: 1.25; }
-.lx-h2 { font-size: 1.25rem; line-height: 1.3; }
-.lx-h3 { font-size: 1.05rem; line-height: 1.4; }
+.lx-h1 {
+    font-size: 1.6rem;
+    line-height: 1.25;
+}
+.lx-h2 {
+    font-size: 1.25rem;
+    line-height: 1.3;
+}
+.lx-h3 {
+    font-size: 1.05rem;
+    line-height: 1.4;
+}
 
 // ── Inline text formats ───────────────────────────────────────────────────────
-// vertical-align:baseline + line-height:inherit = zero layout shift on bold/italic
+// Lexical applies theme classes to the inner-most text element.
+// Use direct property declarations for reliable layering.
+// The [data-lexical-text] selector ensures we only target Lexical text spans.
 [data-lexical-text="true"] {
-  --u: ;
-  --s: ;
-  text-decoration: var(--u) var(--s);
-  line-height: inherit;
-  vertical-align: baseline;
+    line-height: inherit;
+    vertical-align: baseline;
+}
 
-  &.lx-bold {
+.lx-bold {
     font-weight: $fw-bold;
-    // Prevents synthesised bold from slightly widening glyphs and shifting neighbours
-    font-synthesis: none;
-  }
-  &.lx-italic    { font-style: italic; }
-  &.lx-underline { --u: underline; }
-  &.lx-strike    { --s: line-through; color: $color-text-muted; }
+}
+.lx-italic {
+    font-style: italic;
+}
+.lx-underline {
+    text-decoration: underline;
+}
+.lx-strike {
+    text-decoration: line-through;
+    color: $color-text-muted;
+}
+// When both underline and strikethrough are active on the same element
+.lx-underline.lx-strike {
+    text-decoration: underline line-through;
 }
 
 // ── Text alignment ────────────────────────────────────────────────────────────
-.editor-text-left    { text-align: left; }
-.editor-text-center  { text-align: center; }
-.editor-text-right   { text-align: right; }
-.editor-text-justify { text-align: justify; }
+.editor-text-left {
+    text-align: left;
+}
+.editor-text-center {
+    text-align: center;
+}
+.editor-text-right {
+    text-align: right;
+}
+.editor-text-justify {
+    text-align: justify;
+}
 
 // ── Image node ────────────────────────────────────────────────────────────────
 .lx-image-wrapper {
-  display: block;
-  margin: 6px 0;
-  border-radius: $radius-md;
-  overflow: hidden;
-  user-select: none;
-  background: rgba($color-text, 0.04);
-  // Border so empty/broken state is still visible
-  border: 1px solid $color-border;
+    margin: 6px 0;
+    border-radius: $radius-md;
+    overflow: hidden;
+    user-select: none;
+
+    &.lx-image-selected {
+        outline: 2px solid $color-accent;
+        outline-offset: 2px;
+    }
 }
 
 .lx-image {
-  display: block;
-  max-width: 100%;
-  height: auto;
-  border-radius: $radius-md;
+    display: block;
+    max-width: 100%;
+    height: auto;
+    border-radius: $radius-md;
 }
 
 .lx-image-error {
-  padding: 12px 16px;
-  font-size: $text-sm;
-  color: $color-text-muted;
-  font-style: italic;
-}
-
-// ── Drag-drop indicator ───────────────────────────────────────────────────────
-.drag-drop-line {
-  background: $color-accent;
-  border-radius: 2px;
-  box-shadow: 0 0 0 2px rgba($color-accent, 0.2);
-
-  &::before, &::after {
-    content: "";
-    position: absolute;
-    top: 50%; transform: translateY(-50%);
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    background: $color-accent;
-  }
-  &::before { left: -3px; }
-  &::after  { right: -3px; }
+    padding: 8px 12px;
+    font-size: $text-sm;
+    color: $color-text-muted;
+    font-style: italic;
 }
 
 // ── Toolbar extras ────────────────────────────────────────────────────────────
 .toolbar-divider {
-  width: 1px;
-  height: 18px;
-  background: $color-border;
-  margin: 0 4px;
-  flex-shrink: 0;
+    width: 1px;
+    height: 18px;
+    background: $color-border;
+    margin: 0 4px;
+    flex-shrink: 0;
 }
 
 .toolbar-label {
-  font-size: $text-xs;
-  font-weight: $fw-semibold;
-  font-family: $font-family;
-  line-height: 1;
-  letter-spacing: 0.02em;
+    font-size: $text-xs;
+    font-weight: $fw-semibold;
+    font-family: $font-family;
+    line-height: 1;
+    letter-spacing: 0.02em;
 }
 
 .toolbar-img-group {
-  position: relative;
-  display: flex;
-  align-items: center;
+    position: relative;
+    display: flex;
+    align-items: center;
 }
 
 .toolbar-img-popover {
-  position: absolute;
-  top: calc(100% + 6px);
-  left: 0;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  background: $color-bg;
-  border: 1px solid $color-border;
-  border-radius: $radius-md;
-  padding: 4px 6px;
-  box-shadow: $shadow-lg;
-  z-index: 300;
-  min-width: 260px;
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: $color-bg;
+    border: 1px solid $color-border;
+    border-radius: $radius-md;
+    padding: 4px 6px;
+    box-shadow: $shadow-lg;
+    z-index: 300;
+    min-width: 260px;
 }
 
 .toolbar-img-input {
-  flex: 1;
-  background: transparent;
-  border: none;
-  outline: none;
-  color: $color-text;
-  font-family: $font-family;
-  font-size: $text-sm;
-  padding: 2px 4px;
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: $color-text;
+    font-family: $font-family;
+    font-size: $text-sm;
+    padding: 2px 4px;
 
-  &::placeholder { color: $color-text-muted; }
+    &::placeholder {
+        color: $color-text-muted;
+    }
 }
 
 .toolbar-img-confirm {
-  width: 24px;
-  height: 24px;
-  border: none;
-  border-radius: $radius-sm;
-  background: $color-accent;
-  color: #fff;
-  cursor: pointer;
-  font-size: $text-md;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  transition: background $transition-fast, opacity $transition-fast;
+    width: 24px;
+    height: 24px;
+    border: none;
+    border-radius: $radius-sm;
+    background: $color-accent;
+    color: #fff;
+    cursor: pointer;
+    font-size: $text-md;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition:
+        background $transition-fast,
+        opacity $transition-fast;
 
-  &:disabled { opacity: 0.4; cursor: default; }
-  &:not(:disabled):hover { background: $color-accent-hover; }
+    &:disabled {
+        opacity: 0.4;
+        cursor: default;
+    }
+    &:not(:disabled):hover {
+        background: $color-accent-hover;
+    }
+}
+
+// ── Inline image block toolbar (Notion-style) ───────────────────────────
+// Shown when the parent <figure> has the .lx-image-selected class
+.lx-image-block-toolbar {
+    display: none;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 8px;
+    margin-top: 4px;
+    background: $color-bg-elevated;
+    border: 1px solid $color-border;
+    border-radius: $radius-md;
+    // Keep the toolbar inside the figure's border-radius
+    overflow: hidden;
+
+    .lx-image-selected & {
+        display: flex;
+    }
+}
+
+.lx-itb-group {
+    display: flex;
+    align-items: center;
+    gap: 0;
+}
+
+.lx-itb-btn {
+    all: unset;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: $radius-sm;
+    color: $color-text-muted;
+    cursor: pointer;
+    font-size: $text-sm;
+    transition:
+        background $transition-fast,
+        color $transition-fast;
+
+    &:hover {
+        background: rgba($color-text, 0.08);
+        color: $color-text;
+    }
+
+    &.pressed {
+        background: rgba($color-accent, 0.15);
+        color: $color-accent;
+    }
+
+    &.lx-itb-del:hover {
+        background: rgba($color-danger, 0.15);
+        color: $color-danger;
+    }
+}
+
+.lx-itb-input {
+    width: 44px;
+    background: $color-bg;
+    border: 1px solid $color-border;
+    border-right: none;
+    border-radius: $radius-sm 0 0 $radius-sm;
+    color: $color-text;
+    font-family: $font-family;
+    font-size: $text-xs;
+    padding: 2px 2px;
+    outline: none;
+    height: 22px;
+    text-align: center;
+
+    /* hide native spinner arrows */
+    -moz-appearance: textfield;
+    appearance: textfield;
+    &::-webkit-inner-spin-button,
+    &::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        appearance: none;
+        margin: 0;
+    }
+
+    &:focus {
+        border-color: $color-accent;
+        border-right-color: $color-accent;
+    }
+    &::placeholder {
+        color: $color-text-muted;
+    }
+}
+
+.lx-itb-spinners {
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    border: 1px solid $color-border;
+    border-radius: 0 $radius-sm $radius-sm 0;
+    overflow: hidden;
+    height: 22px;
+}
+
+.lx-itb-spin {
+    all: unset;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 50%;
+    flex: 1;
+    width: 16px;
+    color: $color-text-muted;
+    cursor: pointer;
+    font-size: 6px;
+    line-height: 1;
+    user-select: none;
+    transition:
+        color $transition-fast,
+        background $transition-fast;
+
+    &:hover {
+        color: $color-text;
+        background: rgba($color-text, 0.08);
+    }
+
+    &:active {
+        background: rgba($color-accent, 0.15);
+        color: $color-accent;
+    }
+}
+
+.lx-itb-spin-up {
+    border-bottom: 1px solid $color-border;
+}
+
+.lx-itb-select {
+    background: $color-bg;
+    border: 1px solid $color-border;
+    border-radius: $radius-sm;
+    color: $color-text;
+    font-family: $font-family;
+    font-size: $text-xs;
+    padding: 2px 4px;
+    outline: none;
+    cursor: pointer;
+    height: 22px;
+
+    &:focus {
+        border-color: $color-accent;
+    }
+}
+
+.lx-itb-sep {
+    width: 1px;
+    height: 16px;
+    background: $color-border;
+    flex-shrink: 0;
 }
