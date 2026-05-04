@@ -22,14 +22,6 @@
         caret-color: $color-accent;
         word-break: break-word;
 
-        // Kill any browser default focus/hover artifacts
-        *:focus {
-            outline: none;
-        }
-        *:hover {
-            outline: none;
-        }
-
         p:only-child:empty::before {
             content: attr(data-placeholder);
             color: $color-text-muted;
@@ -45,14 +37,12 @@
     padding: 1px 4px;
     border-radius: $radius-sm;
     line-height: 1.5;
-    background: transparent;
-}
+    position: relative;
+    transition: background $transition-fast;
 
-.editor-paragraph:hover,
-.editor-paragraph:focus,
-.editor-paragraph:focus-within {
-    background: transparent;
-    outline: none;
+    &:hover {
+        background: rgba($color-text, 0.03);
+    }
 }
 
 // ── Headings ──────────────────────────────────────────────────────────────────
@@ -64,20 +54,11 @@
     font-weight: $fw-semibold;
     color: $color-text;
     margin: 4px 0 0;
-    background: transparent;
-}
+    transition: background $transition-fast;
 
-.lx-h1:hover,
-.lx-h1:focus,
-.lx-h1:focus-within,
-.lx-h2:hover,
-.lx-h2:focus,
-.lx-h2:focus-within,
-.lx-h3:hover,
-.lx-h3:focus,
-.lx-h3:focus-within {
-    background: transparent;
-    outline: none;
+    &:hover {
+        background: rgba($color-text, 0.03);
+    }
 }
 
 .lx-h1 {
@@ -138,7 +119,8 @@
 .lx-hr {
     all: unset;
     display: block;
-    height: 1px;
+    border-radius: 100%;
+    height: 5px;
     background: $color-border;
     margin: 16px 4px;
     border: none;

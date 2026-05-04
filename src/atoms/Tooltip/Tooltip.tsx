@@ -15,9 +15,9 @@ export const Tooltip: ParentComponent<TooltipProps> = (props) => {
       onMouseLeave={() => setOpen(false)}
     >
       {props.children}
-      {open() && props.content && (
+      {/*{open() && props.content && (
         <div class="tooltip-popup">{props.content}</div>
-      )}
+      )}*/}
     </div>
   );
 };
