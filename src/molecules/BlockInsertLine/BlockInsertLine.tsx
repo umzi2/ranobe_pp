@@ -1,4 +1,3 @@
-// import "./Blockinsertline.module.scss"
 export type InsertPosition = "before" | "after";
 
 export interface InsertLineElements {
@@ -27,13 +26,15 @@ export function createInsertLine(
     display: "none",
     zIndex: "9998",
     pointerEvents: "none",
-    alignItems: "center",
-    justifyContent: "center",
   });
 
   document.body.appendChild(line);
 
   const btn = line.querySelector(".bil-btn") as HTMLButtonElement;
+  const track = line.querySelector(".bil-track") as HTMLElement;
+
+  track.style.pointerEvents = "auto";
+
   btn.addEventListener("mousedown", (e: MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -41,14 +42,9 @@ export function createInsertLine(
   btn.addEventListener("click", (e: MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    // position stored as data attribute set by setVisible caller
     const pos = (line.dataset.insertPosition as InsertPosition) ?? "after";
     onInsert(pos);
   });
-
-  // The line itself gets pointer-events via hover CSS on .bil-track
-  const track = line.querySelector(".bil-track") as HTMLElement;
-  track.style.pointerEvents = "auto";
 
   return {
     line,
@@ -57,12 +53,13 @@ export function createInsertLine(
         line.style.display = "none";
         return;
       }
+      // 20px tall, centered on the edge between blocks
       Object.assign(line.style, {
-        display: "flex",
-        top: `${y - 1}px`,
-        left: `${x}px`,
-        width: `${width}px`,
-        height: "2px",
+        display: "block",
+        top:    `${y - 10}px`,  // center the 20px zone on the edge
+        left:   `${x}px`,
+        width:  `${width}px`,
+        height: "20px",
       });
     },
     destroy: () => {

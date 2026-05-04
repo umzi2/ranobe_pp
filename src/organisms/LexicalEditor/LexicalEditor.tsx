@@ -1,7 +1,6 @@
 import { useEditor } from "~/molecules/LexicalEditor/useEditor";
 import { useRichTextPlugin } from "./lib/useRichTextPlugin";
 import { useDraggableBlockPlugin } from "./plugins/useDraggableBlock";
-import { useBlockInsertPlugin } from "./plugins/useBlockInsert";
 import "./LexicalEditor.scss";
 
 export function LexicalEditor() {
@@ -12,7 +11,6 @@ export function LexicalEditor() {
 
   useRichTextPlugin(editor, getEditorRef);
   useDraggableBlockPlugin(editor, getEditorRef);
-  useBlockInsertPlugin(editor, getEditorRef);
 
   return (
     <div class="Lexica">

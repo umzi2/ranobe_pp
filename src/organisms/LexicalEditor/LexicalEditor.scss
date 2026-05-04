@@ -1,31 +1,29 @@
 @use "~/styles/variables" as *;
 
-// ── Global styles for vanilla-JS DOM elements & string-class JSX components ──
-// These MUST be plain .scss (not .module.scss) so class names aren't hashed.
 @use "../../atoms/ToggleButton/ToggleButton" as *;
 @use "../../atoms/Tooltip/Tooltip" as *;
 @use "../../molecules/BlockDragHandle/BlockDragHandle" as *;
-@use "../../molecules/BlockInsertLine/BlockInsertLine" as *;
 
 // ── Editor shell ──────────────────────────────────────────────────────────────
 .Lexica {
   width: 100%;
   height: 100%;
   background: $color-bg-elevated;
-  overflow-y: auto;
+  // overflow:visible — fixed children (drag handle) must not be clipped
+  overflow: visible;
   position: relative;
 
-  // padding-left = handle_width(24) + left_offset(8) + inner_gap(8) = 40px
-  // Handle sits at er.left + 6px, so it stays inside the editor container.
   &_editor {
-    padding: 36px 56px 120px 40px;
+    // left: handle(24px) + edge-gap(6px) + text-gap(6px) = 36px
+    padding: 28px 48px 80px 36px;
     max-width: 760px;
     margin: 0 auto;
     min-height: 100%;
     outline: none;
     font-family: $font-family;
     font-size: $text-md;
-    line-height: 1.75;
+    // Single line-height for everything — prevents bold/italic causing reflow
+    line-height: 1.5;
     color: $color-text;
     caret-color: $color-accent;
     word-break: break-word;
@@ -40,10 +38,16 @@
 }
 
 // ── Paragraph / block ─────────────────────────────────────────────────────────
+// No vertical margin — line-height alone provides rhythm.
+// Padding keeps the hover background from touching adjacent lines.
 .mb-1 {
-  margin: 1px 0;
-  padding: 2px 4px;
+  margin: 0;
+  padding: 1px 4px;
   border-radius: $radius-sm;
+  // Lock the block's own line-height so bold text can't inflate it
+  line-height: 1.5;
+  // Prevent inline font-weight changes from shifting layout
+  font-feature-settings: "tnum" 0;
   transition: background $transition-fast;
   position: relative;
 
@@ -53,6 +57,7 @@
 }
 
 // ── Inline text formats ───────────────────────────────────────────────────────
+// All spans get the same line-height as their parent so nothing jumps.
 [data-lexical-text="true"] {
   --u: ;
   --s: ;
@@ -64,7 +69,14 @@
   &.lx-strike    { --s: line-through; color: $color-text-muted; }
 }
 
-// ── Drag drop indicator line (appended to <body> by useDraggableBlock) ────────
+
+// ── Text alignment ────────────────────────────────────────────────────────────
+.editor-text-left    { text-align: left; }
+.editor-text-center  { text-align: center; }
+.editor-text-right   { text-align: right; }
+.editor-text-justify { text-align: justify; }
+
+// ── Drag drop indicator line ──────────────────────────────────────────────────
 .drag-drop-line {
   background: $color-accent;
   border-radius: 2px;
@@ -83,4 +95,13 @@
   }
   &::before { left: -3px; }
   &::after  { right: -3px; }
+}
+
+// ── Toolbar divider ───────────────────────────────────────────────────────────
+.toolbar-divider {
+  width: 1px;
+  height: 18px;
+  background: $color-border;
+  margin: 0 4px;
+  flex-shrink: 0;
 }

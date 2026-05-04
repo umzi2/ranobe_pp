@@ -1,7 +1,5 @@
 import { ParagraphNode, RootNode, TextNode, type CreateEditorArgs } from "lexical";
 
-// import { EmojiNode } from "./plugins/emoji/node";
-
 export const COMMENTS_EDITOR_CONFIG: CreateEditorArgs = {
   namespace: "CommentsEditor",
   onError: (e: Error) => console.error(e),
@@ -9,10 +7,14 @@ export const COMMENTS_EDITOR_CONFIG: CreateEditorArgs = {
   theme: {
     paragraph: "mb-1",
     text: {
-        bold: 'lx-bold',
-        italic: 'lx-italic',
-        underline: 'lx-underline',
-        strikethrough: 'lx-strike',
-      },
+      bold: "lx-bold",
+      italic: "lx-italic",
+      underline: "lx-underline",
+      strikethrough: "lx-strike",
+    },
+    // Alignment classes applied by FORMAT_ELEMENT_COMMAND
+    ltr: "",
+    rtl: "",
+    indent: "",
   },
 };
