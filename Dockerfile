@@ -1,28 +1,41 @@
-# ──────────────────────────────────────────────────────────
-# Ranobe PP — основной редактор (Solid.js + Vinxi, SPA)
-# ──────────────────────────────────────────────────────────
+# ──────────────────────────────────────────────
+# Stage 1: сборка
+# ──────────────────────────────────────────────
+FROM rust:1.94-slim-bookworm AS builder
 
-FROM oven/bun:1-alpine AS build
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        protobuf-compiler \
+        pkg-config \
+        libssl-dev \
+    && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /app
 
-ARG VITE_BACKEND_URL=http://localhost:8080
-ENV VITE_BACKEND_URL=$VITE_BACKEND_URL
-
-COPY package.json bun.lock ./
-RUN bun install --frozen-lockfile
-
 COPY . .
-RUN bun run build
 
-# ── Production (static-web-server) ─────────────────────
-FROM joseluisq/static-web-server:2-alpine
+RUN cargo build --release
 
-ENV SERVER_PORT=80
-ENV SERVER_ROOT=/public
-ENV SERVER_FALLBACK_PAGE=/public/index.html
-ENV SERVER_ERROR_PAGE_404=/public/index.html
-ENV SERVER_REDIRECT_TRAILING_SLASH=false
+# ──────────────────────────────────────────────
+# Stage 2: финальный образ
+# ──────────────────────────────────────────────
+FROM debian:bookworm-slim
 
-COPY --from=build /app/.output/public /public
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        ca-certificates \
+        libssl3 \
+        curl \
+    && rm -rf /var/lib/apt/lists/*
 
-EXPOSE 80
+WORKDIR /app
+
+COPY --from=builder /app/target/release/ranobe_pp_backend /app/ranobe_pp_backend
+
+RUN mkdir -p /app/data2 /app/backups
+
+EXPOSE 8080
+
+ENV RUST_LOG=info,ranobe_pp_backend=debug
+
+CMD ["/app/ranobe_pp_backend"]
