@@ -4,6 +4,9 @@ on:
     tags:
       - "v*"
 
+env:
+  BACKEND_URL: ${{ vars.VITE_BACKEND_URL || 'https://backend.ranobe.pro' }}
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
