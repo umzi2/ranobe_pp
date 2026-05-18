@@ -1,0 +1,78 @@
+name: Build & Deploy
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # ── Build both images ──────────────────────────
+
+      - name: Build editor image
+        run: |
+          docker build \
+            --build-arg VITE_BACKEND_URL="$BACKEND_URL" \
+            -t ranobe-editor:${{ github.run_number }} \
+            -t ranobe-editor:latest \
+            .
+
+      - name: Build viewer image
+        run: |
+          docker build \
+            --build-arg VITE_BACKEND_URL="$BACKEND_URL" \
+            -t ranobe-viewer:${{ github.run_number }} \
+            -t ranobe-viewer:latest \
+            ./viewer-site
+
+      # ── SSH ────────────────────────────────────────
+
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H ${{ secrets.DEPLOY_HOST }} >> ~/.ssh/known_hosts
+
+      # ── Transfer images ────────────────────────────
+
+      - name: Send editor image to server
+        run: |
+          docker save ranobe-editor:latest \
+            | ssh -i ~/.ssh/deploy_key test@${{ secrets.DEPLOY_HOST }} "docker load"
+
+      - name: Send viewer image to server
+        run: |
+          docker save ranobe-viewer:latest \
+            | ssh -i ~/.ssh/deploy_key test@${{ secrets.DEPLOY_HOST }} "docker load"
+
+      # ── Deploy stack ───────────────────────────────
+
+      - name: Copy compose file
+        run: |
+          scp -i ~/.ssh/deploy_key docker-compose.yml \
+            test@${{ secrets.DEPLOY_HOST }}:~/docker-compose.ranobe.yml
+
+      - name: Deploy to Swarm
+        run: |
+          ssh -i ~/.ssh/deploy_key test@${{ secrets.DEPLOY_HOST }} \
+            "docker stack deploy -c ~/docker-compose.ranobe.yml ranobe"
+
+      # ── Force update both services ──────────────────
+
+      - name: Force update editor
+        run: |
+          ssh -i ~/.ssh/deploy_key test@${{ secrets.DEPLOY_HOST }} \
+            "docker service update --image ranobe-editor:latest --force ranobe_editor"
+
+      - name: Force update viewer
+        run: |
+          ssh -i ~/.ssh/deploy_key test@${{ secrets.DEPLOY_HOST }} \
+            "docker service update --image ranobe-viewer:latest --force ranobe_viewer"
