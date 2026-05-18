@@ -1,17 +1,10 @@
 # ──────────────────────────────────────────────────────────
-# docker-compose.yml
-#
-# Запускает оба приложения:
-#   - editor (ranobe_pp)  → http://localhost:3000
-#   - viewer (viewer-site) → http://localhost:3001
-#
-# Бэкенд ожидается на http://localhost:8080 (меняется через
-# переменную VITE_BACKEND_URL при сборке).
-#
-# Сборка:
-#   docker compose build --build-arg VITE_BACKEND_URL=http://backend:8080
+# docker-compose.yml — Swarm-ready
 #
 # Запуск:
+#   docker stack deploy -c docker-compose.yml ranobe
+#
+# Или локально:
 #   docker compose up -d
 # ──────────────────────────────────────────────────────────
 
@@ -22,11 +15,21 @@ services:
       dockerfile: Dockerfile
       args:
         VITE_BACKEND_URL: ${VITE_BACKEND_URL:-http://localhost:8080}
+    image: ranobe-editor:latest
     ports:
-      - "3000:80"
-    restart: unless-stopped
+      - "3098:80"
     networks:
       - ranobe
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: any
+        delay: 5s
+        max_attempts: 3
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 128M
 
   viewer:
     build:
@@ -34,12 +37,23 @@ services:
       dockerfile: Dockerfile
       args:
         VITE_BACKEND_URL: ${VITE_BACKEND_URL:-http://localhost:8080}
+    image: ranobe-viewer:latest
     ports:
-      - "3001:80"
-    restart: unless-stopped
+      - "3099:80"
     networks:
       - ranobe
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: any
+        delay: 5s
+        max_attempts: 3
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 128M
 
 networks:
   ranobe:
-    driver: bridge
+    driver: overlay
+    attachable: true
