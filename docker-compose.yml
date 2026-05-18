@@ -1,59 +1,38 @@
-# ──────────────────────────────────────────────────────────
-# docker-compose.yml — Swarm-ready
-#
-# Запуск:
+version: "3.8"
+
+# ──────────────────────────────────────────────
+# Docker Compose + Swarm Stack
+# Запуск в Swarm:
 #   docker stack deploy -c docker-compose.yml ranobe
-#
-# Или локально:
-#   docker compose up -d
-# ──────────────────────────────────────────────────────────
+# ──────────────────────────────────────────────
 
 services:
-  editor:
+  ranobe-backend:
+    image: test:lastes
     build:
       context: .
       dockerfile: Dockerfile
-      args:
-        VITE_BACKEND_URL: ${VITE_BACKEND_URL:-http://localhost:8080}
-    image: ranobe-editor:latest
-    ports:
-      - "3098:80"
-    networks:
-      - ranobe
-    deploy:
-      replicas: 1
-      restart_policy:
-        condition: any
-        delay: 5s
-        max_attempts: 3
-      resources:
-        limits:
-          cpus: "0.5"
-          memory: 128M
 
-  viewer:
-    build:
-      context: ./viewer-site
-      dockerfile: Dockerfile
-      args:
-        VITE_BACKEND_URL: ${VITE_BACKEND_URL:-http://localhost:8080}
-    image: ranobe-viewer:latest
     ports:
-      - "3099:80"
-    networks:
-      - ranobe
-    deploy:
-      replicas: 1
-      restart_policy:
-        condition: any
-        delay: 5s
-        max_attempts: 3
-      resources:
-        limits:
-          cpus: "0.5"
-          memory: 128M
+      - "2467:8080"
 
+    networks:
+      - ranobe-net
+    # ── Swarm Deploy ────────────────────────
+    deploy:
+      mode: replicated
+      replicas: 1
+
+      # placement:
+      #   constraints:
+      #     - node.role == manager
+
+# ──────────────────────────────────────────────
+
+# ──────────────────────────────────────────────
+# Networks
+# ──────────────────────────────────────────────
 networks:
-  ranobe:
+  ranobe-net:
     driver: overlay
     attachable: true
