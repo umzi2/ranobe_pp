@@ -5,8 +5,11 @@ import {
   type CreateEditorArgs,
 } from "lexical";
 import { HeadingNode } from "@lexical/rich-text";
+import { LinkNode } from "@lexical/link";
 import { ImageNode } from "./src/organisms/LexicalEditor/nodes/ImageNode";
 import { HorizontalRuleNode } from "./src/organisms/LexicalEditor/nodes/HorizontalRuleNode";
+import { QuoteNode } from "./src/organisms/LexicalEditor/nodes/QuoteNode";
+import { CommentNode } from "./src/organisms/LexicalEditor/nodes/CommentNode";
 
 export const COMMENTS_EDITOR_CONFIG: CreateEditorArgs = {
   namespace: "CommentsEditor",
@@ -18,6 +21,9 @@ export const COMMENTS_EDITOR_CONFIG: CreateEditorArgs = {
     HeadingNode,
     ImageNode,
     HorizontalRuleNode,
+    LinkNode,
+    QuoteNode,
+    CommentNode,
   ],
   theme: {
     paragraph: "editor-paragraph",

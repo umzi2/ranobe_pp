@@ -30,12 +30,17 @@ export class HorizontalRuleNode extends DecoratorNode<null> {
   }
 
   createDOM(_config: EditorConfig, editor: LexicalEditor): HTMLElement {
+    const wrapper = document.createElement("div");
+    wrapper.className = "lx-hr-wrapper";
+    wrapper.contentEditable = "false";
+    wrapper.setAttribute("data-key", this.__key);
+
     const hr = document.createElement("hr");
     hr.className = "lx-hr";
-    hr.contentEditable = "false";
+    wrapper.appendChild(hr);
 
     const key = this.__key;
-    hr.addEventListener("click", (e) => {
+    wrapper.addEventListener("click", (e) => {
       e.stopPropagation();
       e.preventDefault();
       editor.update(() => {
@@ -47,7 +52,7 @@ export class HorizontalRuleNode extends DecoratorNode<null> {
       });
     });
 
-    return hr;
+    return wrapper;
   }
 
   updateDOM(): boolean {

@@ -1,20 +1,36 @@
 import { $getSelection, $isNodeSelection } from "lexical";
 import { useEditor } from "~/molecules/EditorContext/EditorContext";
 import { useRichTextPlugin } from "./plugins/useRichTextPlugin";
+import { useQuoteEnter } from "./plugins/useQuoteEnter";
 import { useDraggableBlockPlugin } from "./plugins/useDraggableBlock";
+import { useImageDragDrop } from "./plugins/useImageDragDrop";
+import { useImagePaste } from "./plugins/useImagePaste";
+import type { ImageDragDropParams } from "./plugins/imageUploadPipeline";
 import { onMount, onCleanup } from "solid-js";
 import { $isImageNode } from "./nodes/ImageNode";
 import { $isHorizontalRuleNode } from "./nodes/HorizontalRuleNode";
+import { logEditorState } from "~/services/api";
 import "./LexicalEditor.scss";
 
-export function LexicalEditor() {
+export interface LexicalEditorProps {
+  chapterParams?: ImageDragDropParams;
+}
+
+export function LexicalEditor(props: LexicalEditorProps) {
   const editor = useEditor();
   let editorRef: HTMLDivElement | undefined;
 
   const getEditorRef = () => editorRef;
 
   useRichTextPlugin(editor, getEditorRef);
+  useQuoteEnter(editor);
   useDraggableBlockPlugin(editor, getEditorRef);
+
+  // Image upload: drag-and-drop + clipboard paste
+  if (props.chapterParams) {
+    useImageDragDrop(editor, getEditorRef, () => props.chapterParams!);
+    useImagePaste(editor, getEditorRef, () => props.chapterParams!);
+  }
 
   // Image selection → toggle .lx-image-selected class on the <figure>
   onMount(() => {
@@ -55,11 +71,17 @@ export function LexicalEditor() {
               }
             }
           } else if (hrNode) {
-            // Handle HR selection
-            const hrs = editorRef?.querySelectorAll("hr.lx-hr") ?? [];
-            for (const hr of hrs) {
-              hr.classList.add("lx-image-selected");
-              break;
+            // Handle HR selection — find wrapper by node key
+            const wrappers =
+              editorRef?.querySelectorAll(".lx-hr-wrapper") ?? [];
+            for (const w of wrappers) {
+              if (
+                w instanceof HTMLElement &&
+                w.getAttribute("data-key") === hrNode.__key
+              ) {
+                w.classList.add("lx-image-selected");
+                break;
+              }
             }
           }
         }
@@ -68,14 +90,9 @@ export function LexicalEditor() {
     onCleanup(unreg);
   });
 
-  // Debug console
+  // Debug: log editor state on every update (via API service)
   onMount(() => {
-    const unregister = editor.registerUpdateListener(({ editorState }) => {
-      const json = editorState.toJSON();
-      console.group("%c📝 Lexical state", "color:#818cf8;font-weight:600");
-      console.log(JSON.stringify(json, null, 2));
-      console.groupEnd();
-    });
+    const unregister = logEditorState(editor);
     onCleanup(unregister);
   });
 

@@ -1,0 +1,112 @@
+syntax = "proto3";
+package doc;
+enum NodeType {
+  NODE_UNSPECIFIED = 0;
+  NODE_ROOT = 1;
+  NODE_PARAGRAPH = 2;
+  NODE_TEXT = 3;
+  NODE_HEADING = 4;
+  NODE_IMAGE = 5;
+  NODE_HORIZONTAL_RULE = 6;
+  NODE_QUOTE = 7;
+  NODE_CODE = 8;
+  NODE_LIST = 9;
+  NODE_LIST_ITEM = 10;
+  NODE_LINK = 11;
+  NODE_LINE_BREAK = 12;
+}
+
+enum HeadingTag {
+  HEADING_UNSPECIFIED = 0;
+  HEADING_H1 = 1;
+  HEADING_H2 = 2;
+  HEADING_H3 = 3;
+  HEADING_H4 = 4;
+  HEADING_H5 = 5;
+  HEADING_H6 = 6;
+}
+
+enum Alignment {
+  ALIGN_INHERIT = 0;
+  ALIGN_LEFT = 1;
+  ALIGN_CENTER = 2;
+  ALIGN_RIGHT = 3;
+  ALIGN_JUSTIFY = 4;
+}
+
+message Document {
+  string version = 1;
+  map<string, string> meta = 2;
+  Node root = 3;
+}
+
+message Node {
+  NodeType type = 1;
+  int32 version = 2;
+
+  map<string, string> attrs = 3;
+
+  repeated Node children = 4;
+
+  oneof data {
+    TextData text = 10;
+    ImageData image = 11;
+    HeadingData heading = 12;
+    ListData list = 13;
+    LinkData link = 14;
+  }
+}
+
+message TextData {
+  string text = 1;
+  uint32 format = 2;
+  uint32 detail = 3;
+  string mode = 4;
+  string style = 5;
+}
+
+message ImageData {
+  string src = 1;
+  string alt = 2;
+  Alignment alignment = 3;
+  uint32 width = 4;
+  string width_type = 5;
+}
+
+message HeadingData {
+  HeadingTag tag = 1;
+}
+
+message ListData {
+  bool ordered = 1;
+  uint32 start = 2;
+  string list_type = 3;
+}
+
+message LinkData {
+  string url = 1;
+  string rel = 2;
+  string target = 3;
+  string title = 4;
+}
+
+message DocumentRequest {
+  int64 id = 1;
+}
+message AWSPutRequest{
+    int32 team_id = 1;
+    int32 title_id = 2;
+    int32 chapter_id = 3; 
+}
+message AWSPutResponse{
+    string url = 1;
+    string id = 2;
+}
+service DocumentReadService {
+  rpc Read(DocumentRequest) returns (Document);
+  rpc GetAws(AWSPutRequest) returns (AWSPutResponse);
+}
+
+service DocumentSaveService {
+  rpc Save(Document) returns (DocumentRequest);
+}

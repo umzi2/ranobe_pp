@@ -1,22 +1,47 @@
-import { onMount, onCleanup, Accessor } from 'solid-js';
-import { registerRichText } from '@lexical/rich-text';
-import { $createParagraphNode, $getRoot, LexicalEditor } from 'lexical';
-import { mergeRegister } from 'lexical';
+import { onMount, onCleanup, Accessor } from "solid-js";
+import { registerRichText } from "@lexical/rich-text";
+import { registerLink, registerClickableLink } from "@lexical/link";
+import { $createParagraphNode, $getRoot, LexicalEditor } from "lexical";
+import { mergeRegister } from "lexical";
 
 export function useRichTextPlugin(
   editor: LexicalEditor,
-  rootElementAccessor: Accessor<HTMLDivElement | undefined>
+  rootElementAccessor: Accessor<HTMLDivElement | undefined>,
 ) {
   onMount(() => {
     const rootElement = rootElementAccessor();
     if (!rootElement) {
-      console.error('Root element not available in useRichTextPlugin');
+      console.error("Root element not available in useRichTextPlugin");
       return;
     }
 
     editor.setRootElement(rootElement);
 
-    const unregister = mergeRegister(registerRichText(editor));
+    // Simple stores for registerLink + registerClickableLink
+    const linkStores = {
+      disabled: {
+        peek: () => false as boolean,
+        value: false as boolean,
+      },
+      newTab: {
+        peek: () => false as boolean,
+        value: false as boolean,
+      },
+      validateUrl: {
+        peek: () => undefined as ((url: string) => boolean) | undefined,
+        value: undefined as ((url: string) => boolean) | undefined,
+      },
+      attributes: {
+        peek: () => undefined as Record<string, string> | undefined,
+        value: undefined as Record<string, string> | undefined,
+      },
+    };
+
+    const unregister = mergeRegister(
+      registerRichText(editor),
+      registerLink(editor, linkStores as any),
+      registerClickableLink(editor, linkStores as any),
+    );
 
     editor.update(() => {
       const root = $getRoot();
@@ -24,10 +49,7 @@ export function useRichTextPlugin(
         const paragraph = $createParagraphNode();
         root.append(paragraph);
       }
-      
-    }
-    
-    );
+    });
 
     onCleanup(() => {
       unregister();

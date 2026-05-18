@@ -12,7 +12,9 @@ export default createHandler(() => (
           {assets}
         </head>
         <body>
-          <div class = "root"id="app">{children}</div>
+          <div class="root" id="app">
+            {children}
+          </div>
           {scripts}
         </body>
       </html>

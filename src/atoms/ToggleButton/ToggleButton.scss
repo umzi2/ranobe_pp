@@ -5,8 +5,9 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 28px;
-    height: 28px;
+    /* padding: 8px; */
+    /* width: 28px;
+    height: 28px; */
     border-radius: $radius-sm;
     color: $color-text-muted;
     cursor: pointer;
@@ -23,8 +24,9 @@
     }
 
     svg {
-        width: 18px;
-        height: 18px;
+        margin: 0 4px 0 4px;
+        width: 28px;
+        height: 28px;
         flex-shrink: 0;
     }
 }

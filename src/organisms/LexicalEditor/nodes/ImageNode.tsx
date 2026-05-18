@@ -333,6 +333,8 @@ export class ImageNode extends DecoratorNode<null> {
 
   private createSep(): HTMLElement {
     const sep = document.createElement("span");
+    sep.setAttribute("role", "separator");
+    sep.setAttribute("data-orientation", "vertical");
     sep.className = "lx-itb-sep";
     return sep;
   }

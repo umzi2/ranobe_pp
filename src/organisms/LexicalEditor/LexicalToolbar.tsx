@@ -6,7 +6,9 @@ import {
   FORMAT_TEXT_COMMAND,
   FORMAT_ELEMENT_COMMAND,
   ElementFormatType,
+  ElementNode,
   mergeRegister,
+  $createTextNode,
 } from "lexical";
 import {
   $createHeadingNode,
@@ -14,6 +16,13 @@ import {
   HeadingTagType,
 } from "@lexical/rich-text";
 import { $setBlocksType } from "@lexical/selection";
+import {
+  TOGGLE_LINK_COMMAND,
+  $createLinkNode,
+  $isLinkNode,
+} from "@lexical/link";
+import { $createQuoteNode, $isQuoteNode } from "./nodes/QuoteNode";
+import { $isCommentNode, $toggleComment } from "./nodes/CommentNode";
 import {
   Component,
   createSignal,
@@ -35,7 +44,16 @@ import {
   TbOutlineAlignJustified as IconAlignJustify,
   TbOutlinePhoto as IconImage,
   TbOutlineSeparatorHorizontal as IconHr,
+  TbOutlineDeviceFloppy as IconSave,
+  TbOutlineH1 as IconH1,
+  TbOutlineH2 as IconH2,
+  TbOutlineH3 as IconH3,
+  TbOutlineLink as IconLink,
+  TbOutlineBlockquote as IconQuote,
+  TbOutlineCircleAsterisk as IconComment,
 } from "solid-icons/tb";
+import { Separator } from "@kobalte/core/separator";
+import { sendEditorState } from "~/services/api";
 import { ToggleButton } from "~/atoms/ToggleButton/ToggleButton";
 import { Tooltip } from "~/atoms/Tooltip/Tooltip";
 import { $createImageNode, $isImageNode } from "./nodes/ImageNode";
@@ -69,7 +87,10 @@ export const Toolbar: Component = () => {
   const [showImgInput, setShowImgInput] = createSignal(false);
   const [imgUrl, setImgUrl] = createSignal("");
 
-  // Track whether an image is selected (for visual feedback)
+  // Track active states for link, quote, comment
+  const [isInLink, setIsInLink] = createSignal(false);
+  const [isInQuote, setIsInQuote] = createSignal(false);
+  const [isInComment, setIsInComment] = createSignal(false);
   const [hasImageSelection, setHasImageSelection] = createSignal(false);
 
   onMount(() => {
@@ -98,6 +119,21 @@ export const Toolbar: Component = () => {
             anchor.getKey() === "root"
               ? anchor
               : anchor.getTopLevelElementOrThrow();
+
+          // Track link, quote, comment active state (with null guards)
+          try {
+            setIsInLink($isLinkNode(anchor) || $isLinkNode(anchor.getParent()));
+          } catch {
+            setIsInLink(false);
+          }
+          setIsInQuote($isQuoteNode(element));
+          try {
+            setIsInComment(
+              $isCommentNode(anchor) || $isCommentNode(anchor.getParent()),
+            );
+          } catch {
+            setIsInComment(false);
+          }
 
           const fmt = (element as any).getFormatType?.() as
             | ElementFormatType
@@ -147,9 +183,10 @@ export const Toolbar: Component = () => {
         anchor.getKey() === "root"
           ? anchor
           : anchor.getTopLevelElementOrThrow();
+
       const hr = $createHorizontalRuleNode();
       const para = $createParagraphNode();
-      element.insertAfter(hr);
+      element.replace(hr);
       hr.insertAfter(para);
       para.select();
     });
@@ -171,6 +208,45 @@ export const Toolbar: Component = () => {
     });
     setImgUrl("");
     setShowImgInput(false);
+  }
+
+  function insertLink() {
+    const url = window.prompt("URL:", "https://");
+    if (!url) return;
+    editor.dispatchCommand(TOGGLE_LINK_COMMAND, { url, target: "_blank" });
+  }
+
+  function toggleQuote() {
+    editor.update(() => {
+      const sel = $getSelection();
+      const anchor = $isRangeSelection(sel) ? sel.anchor.getNode() : null;
+      if (!anchor) return;
+      const el: ElementNode =
+        anchor.getKey() === "root"
+          ? (anchor as ElementNode)
+          : anchor.getTopLevelElementOrThrow();
+      if ($isQuoteNode(el)) {
+        const para = $createParagraphNode();
+        const children = [...el.getChildren()];
+        el.replace(para);
+        for (const c of children) para.append(c);
+        para.select();
+      } else {
+        const quote = $createQuoteNode();
+        const children = [...el.getChildren()];
+        el.replace(quote);
+        for (const c of children) quote.append(c);
+        quote.select();
+      }
+    });
+  }
+
+  function insertComment() {
+    const text = window.prompt("Comment text:");
+    if (!text) return;
+    editor.update(() => {
+      $toggleComment(text);
+    });
   }
 
   // (delete is handled in the inline block toolbar)
@@ -210,10 +286,10 @@ export const Toolbar: Component = () => {
     { label: "По ширине", icon: <IconAlignJustify />, value: "justify" },
   ];
 
-  const headings: { tag: HeadingTagType; label: string }[] = [
-    { tag: "h1", label: "H1" },
-    { tag: "h2", label: "H2" },
-    { tag: "h3", label: "H3" },
+  const headings: { tag: HeadingTagType; icon: JSXElement }[] = [
+    { tag: "h1", icon: <IconH1 /> },
+    { tag: "h2", icon: <IconH2 /> },
+    { tag: "h3", icon: <IconH3 /> },
   ];
 
   return (
@@ -227,13 +303,13 @@ export const Toolbar: Component = () => {
               onChange={() => setHeading(h.tag)}
               aria-label={h.tag.toUpperCase()}
             >
-              <span class="toolbar-label">{h.label}</span>
+              {h.icon}
             </ToggleButton>
           </Tooltip>
         )}
       </For>
 
-      <div class="toolbar-divider" />
+      <Separator orientation="vertical" />
 
       {/* ── Text formatting ── */}
       <For each={textActions}>
@@ -250,7 +326,7 @@ export const Toolbar: Component = () => {
         )}
       </For>
 
-      <div class="toolbar-divider" />
+      <Separator orientation="vertical" />
 
       {/* ── Alignment ── */}
       <For each={alignActions}>
@@ -269,7 +345,7 @@ export const Toolbar: Component = () => {
         )}
       </For>
 
-      <div class="toolbar-divider" />
+      <Separator orientation="vertical" />
 
       {/* ── Horizontal rule ── */}
       <Tooltip content="Разделитель">
@@ -282,7 +358,55 @@ export const Toolbar: Component = () => {
         </ToggleButton>
       </Tooltip>
 
-      <div class="toolbar-divider" />
+      <Separator orientation="vertical" />
+
+      {/* ── Link ── */}
+      <Tooltip content="Вставить ссылку">
+        <ToggleButton
+          pressed={isInLink()}
+          onChange={insertLink}
+          aria-label="Insert link"
+        >
+          <IconLink />
+        </ToggleButton>
+      </Tooltip>
+
+      {/* ── Quote ── */}
+      <Tooltip content="Цитата">
+        <ToggleButton
+          pressed={isInQuote()}
+          onChange={toggleQuote}
+          aria-label="Toggle quote"
+        >
+          <IconQuote />
+        </ToggleButton>
+      </Tooltip>
+
+      {/* ── Comment ── */}
+      <Tooltip content="Комментарий (*)">
+        <ToggleButton
+          pressed={isInComment()}
+          onChange={insertComment}
+          aria-label="Insert comment"
+        >
+          <IconComment />
+        </ToggleButton>
+      </Tooltip>
+
+      <Separator orientation="vertical" />
+
+      {/* ── Save / Send to API ── */}
+      <Tooltip content="Сохранить запись">
+        <ToggleButton
+          pressed={false}
+          onChange={() => sendEditorState(editor)}
+          aria-label="Save to API"
+        >
+          <IconSave />
+        </ToggleButton>
+      </Tooltip>
+
+      <Separator orientation="vertical" />
 
       <div class="toolbar-img-group">
         <Tooltip content="Вставить изображение">
@@ -298,14 +422,14 @@ export const Toolbar: Component = () => {
           </ToggleButton>
         </Tooltip>
 
-        <Show when={hasImageSelection()}>
+        {/*<Show when={hasImageSelection()}>
           <span
             class="toolbar-label"
             style="color: $color-text-muted; font-size: 10px;"
           >
             🖼 изображение
           </span>
-        </Show>
+        </Show>*/}
 
         <Show when={showImgInput()}>
           <div class="toolbar-img-popover">

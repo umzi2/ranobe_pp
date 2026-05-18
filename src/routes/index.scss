@@ -1,13 +1,14 @@
 /* Centered card with room on the left for the floating drag handle */
 .editor-page {
-    height: 85vh;
-    width: min(680px, 88vw);
-    margin-left: 80px;
+    height: 100vh;
+    max-width: 1440px;
+    width: 100vw;
+    /* margin-left: 80px; */
 }
 
-@media (max-width: 800px) {
+/* @media (max-width: 800px) {
     .editor-page {
         margin-left: 48px;
         width: calc(100vw - 64px);
     }
-}
+} */
