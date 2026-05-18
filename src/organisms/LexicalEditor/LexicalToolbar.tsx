@@ -8,6 +8,8 @@ import {
   ElementFormatType,
   ElementNode,
   mergeRegister,
+  UNDO_COMMAND,
+  REDO_COMMAND,
   $createTextNode,
 } from "lexical";
 import {
@@ -51,6 +53,8 @@ import {
   TbOutlineLink as IconLink,
   TbOutlineBlockquote as IconQuote,
   TbOutlineCircleAsterisk as IconComment,
+  TbOutlineArrowBackUp as IconUndo,
+  TbOutlineArrowForwardUp as IconRedo,
 } from "solid-icons/tb";
 import { Separator } from "@kobalte/core/separator";
 import { sendEditorState } from "~/services/api";
@@ -75,7 +79,7 @@ interface AlignAction {
   value: Alignment;
 }
 
-export const Toolbar: Component = () => {
+export const Toolbar = (props: { docId?: bigint }) => {
   const editor = useEditor();
 
   const [isBold, setIsBold] = createSignal(false);
@@ -86,6 +90,10 @@ export const Toolbar: Component = () => {
   const [blockType, setBlockType] = createSignal<BlockType>("paragraph");
   const [showImgInput, setShowImgInput] = createSignal(false);
   const [imgUrl, setImgUrl] = createSignal("");
+  const [showLinkInput, setShowLinkInput] = createSignal(false);
+  const [linkUrl, setLinkUrl] = createSignal("");
+  const [showCommentInput, setShowCommentInput] = createSignal(false);
+  const [commentText, setCommentText] = createSignal("");
 
   // Track active states for link, quote, comment
   const [isInLink, setIsInLink] = createSignal(false);
@@ -210,10 +218,12 @@ export const Toolbar: Component = () => {
     setShowImgInput(false);
   }
 
-  function insertLink() {
-    const url = window.prompt("URL:", "https://");
+  function confirmLink() {
+    const url = linkUrl().trim();
     if (!url) return;
     editor.dispatchCommand(TOGGLE_LINK_COMMAND, { url, target: "_blank" });
+    setLinkUrl("");
+    setShowLinkInput(false);
   }
 
   function toggleQuote() {
@@ -241,12 +251,14 @@ export const Toolbar: Component = () => {
     });
   }
 
-  function insertComment() {
-    const text = window.prompt("Comment text:");
+  function confirmComment() {
+    const text = commentText().trim();
     if (!text) return;
     editor.update(() => {
       $toggleComment(text);
     });
+    setCommentText("");
+    setShowCommentInput(false);
   }
 
   // (delete is handled in the inline block toolbar)
@@ -361,15 +373,48 @@ export const Toolbar: Component = () => {
       <Separator orientation="vertical" />
 
       {/* ── Link ── */}
-      <Tooltip content="Вставить ссылку">
-        <ToggleButton
-          pressed={isInLink()}
-          onChange={insertLink}
-          aria-label="Insert link"
-        >
-          <IconLink />
-        </ToggleButton>
-      </Tooltip>
+      <div class="toolbar-link-group">
+        <Tooltip content="Вставить ссылку">
+          <ToggleButton
+            pressed={isInLink()}
+            onChange={(v) => {
+              setShowLinkInput(v);
+              if (!v) setLinkUrl("");
+            }}
+            aria-label="Insert link"
+          >
+            <IconLink />
+          </ToggleButton>
+        </Tooltip>
+
+        <Show when={showLinkInput()}>
+          <div class="toolbar-link-popover">
+            <input
+              class="toolbar-link-input"
+              type="url"
+              placeholder="https://example.com"
+              value={linkUrl()}
+              onInput={(e) => setLinkUrl(e.currentTarget.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") confirmLink();
+                if (e.key === "Escape") {
+                  setShowLinkInput(false);
+                  setLinkUrl("");
+                }
+              }}
+              ref={(el) => requestAnimationFrame(() => el?.focus())}
+            />
+            <button
+              class="toolbar-link-confirm"
+              type="button"
+              disabled={!linkUrl().trim()}
+              onClick={confirmLink}
+            >
+              ↵
+            </button>
+          </div>
+        </Show>
+      </div>
 
       {/* ── Quote ── */}
       <Tooltip content="Цитата">
@@ -383,13 +428,68 @@ export const Toolbar: Component = () => {
       </Tooltip>
 
       {/* ── Comment ── */}
-      <Tooltip content="Комментарий (*)">
+      <div class="toolbar-comment-group">
+        <Tooltip content="Комментарий (*)">
+          <ToggleButton
+            pressed={isInComment()}
+            onChange={(v) => {
+              setShowCommentInput(v);
+              if (!v) setCommentText("");
+            }}
+            aria-label="Insert comment"
+          >
+            <IconComment />
+          </ToggleButton>
+        </Tooltip>
+
+        <Show when={showCommentInput()}>
+          <div class="toolbar-comment-popover">
+            <input
+              class="toolbar-comment-input"
+              type="text"
+              placeholder="Текст комментария"
+              value={commentText()}
+              onInput={(e) => setCommentText(e.currentTarget.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") confirmComment();
+                if (e.key === "Escape") {
+                  setShowCommentInput(false);
+                  setCommentText("");
+                }
+              }}
+              ref={(el) => requestAnimationFrame(() => el?.focus())}
+            />
+            <button
+              class="toolbar-comment-confirm"
+              type="button"
+              disabled={!commentText().trim()}
+              onClick={confirmComment}
+            >
+              ↵
+            </button>
+          </div>
+        </Show>
+      </div>
+
+      <Separator orientation="vertical" />
+
+      {/* ── Undo / Redo ── */}
+      <Tooltip content="Отменить (Ctrl+Z)">
         <ToggleButton
-          pressed={isInComment()}
-          onChange={insertComment}
-          aria-label="Insert comment"
+          pressed={false}
+          onChange={() => editor.dispatchCommand(UNDO_COMMAND, undefined)}
+          aria-label="Undo"
         >
-          <IconComment />
+          <IconUndo />
+        </ToggleButton>
+      </Tooltip>
+      <Tooltip content="Повторить (Ctrl+Shift+Z)">
+        <ToggleButton
+          pressed={false}
+          onChange={() => editor.dispatchCommand(REDO_COMMAND, undefined)}
+          aria-label="Redo"
+        >
+          <IconRedo />
         </ToggleButton>
       </Tooltip>
 
@@ -399,7 +499,7 @@ export const Toolbar: Component = () => {
       <Tooltip content="Сохранить запись">
         <ToggleButton
           pressed={false}
-          onChange={() => sendEditorState(editor)}
+          onChange={() => sendEditorState(editor, props.docId)}
           aria-label="Save to API"
         >
           <IconSave />

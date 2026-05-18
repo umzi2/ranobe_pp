@@ -70,18 +70,25 @@ export function useQuoteEnter(editor: LexicalEditor): void {
         // ── Non-empty paragraph → insert new paragraph inside the quote ──
         const newPara = $createParagraphNode();
         const offset = sel.anchor.offset;
-        const totalLen = currentBlock.getTextContent().length;
 
-        if (offset > 0 && offset < totalLen) {
-          // Split text at cursor: move everything after the cursor to newPara
+        // offset semantics differ by node type:
+        //   TextNode    → character index within the text
+        //   ElementNode → child index within the inline element (CommentNode, LinkNode)
+        const anchorIsText = $isTextNode(anchorNode);
+        const boundary = anchorIsText
+          ? anchorNode.getTextContent().length
+          : (anchorNode as ElementNode).getChildren().length;
+
+        if (offset > 0 && offset < boundary) {
+          // Split at cursor: move everything after the cursor to newPara
           splitBlockAtOffset(currentBlock, anchorNode, offset, newPara);
         } else if (offset === 0) {
           // Cursor at start → insert new paragraph BEFORE current
           currentBlock.insertBefore(newPara);
         }
-        // else offset === totalLen → insert AFTER (handled below)
+        // else offset === boundary → insert AFTER (handled below)
 
-        if (offset === totalLen) {
+        if (offset === boundary) {
           currentBlock.insertAfter(newPara);
         }
 
@@ -98,7 +105,10 @@ export function useQuoteEnter(editor: LexicalEditor): void {
 
 /**
  * Split a block element at the given offset, moving trailing children
- * (including the tail of the anchor text node) into `targetBlock`.
+ * (including the tail of the anchor node) into `targetBlock`.
+ *
+ * Handles both TextNode anchors (offset = character index) and
+ * inline ElementNode anchors like CommentNode / LinkNode (offset = child index).
  */
 function splitBlockAtOffset(
   block: ElementNode,
@@ -106,32 +116,35 @@ function splitBlockAtOffset(
   offset: number,
   targetBlock: ElementNode,
 ): void {
-  // This is a simplified approach — we use the fact that for most cases
-  // the children are just text nodes. We'll move everything after the
-  // anchor node, plus the tail of the anchor node itself.
+  const children = block.getChildren();
+  const anchorIdx = children.findIndex((c) => c.__key === anchorNode.__key);
+  if (anchorIdx < 0) return;
 
-  const anchorText = $isTextNode(anchorNode) ? anchorNode : null;
-
-  if (anchorText) {
-    const nodeText = anchorText.getTextContent();
-    // Keep text before offset, move text after offset
-    anchorText.setTextContent(nodeText.slice(0, offset));
+  if ($isTextNode(anchorNode)) {
+    // ── TextNode anchor: offset is a character index ──
+    const nodeText = anchorNode.getTextContent();
+    anchorNode.setTextContent(nodeText.slice(0, offset));
 
     const afterText = nodeText.slice(offset);
     if (afterText) {
-      const afterNode = $createTextNode(afterText);
-      targetBlock.append(afterNode);
+      targetBlock.append($createTextNode(afterText));
+    }
+  } else if (anchorNode instanceof ElementNode) {
+    // ── Inline element anchor (CommentNode, LinkNode): offset is child index ──
+    const inlineChildren = anchorNode.getChildren();
+    if (offset > 0 && offset < inlineChildren.length) {
+      const toMove = inlineChildren.slice(offset);
+      for (const child of toMove) {
+        child.remove();
+        targetBlock.append(child);
+      }
     }
   }
 
   // Move remaining sibling nodes that come after the anchor
-  const children = block.getChildren();
-  const anchorIdx = children.findIndex((c) => c.__key === anchorNode.__key);
-  if (anchorIdx >= 0) {
-    const afterChildren = children.slice(anchorIdx + 1);
-    for (const child of afterChildren) {
-      child.remove();
-      targetBlock.append(child);
-    }
+  const afterChildren = children.slice(anchorIdx + 1);
+  for (const child of afterChildren) {
+    child.remove();
+    targetBlock.append(child);
   }
 }

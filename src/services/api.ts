@@ -4,7 +4,12 @@ import {
   documentToLexical,
   type LexicalNode,
 } from "./lexical-proto";
-import { saveEditor, editorToDocument, type Document } from "~/gen/lexical-rpc";
+import {
+  saveEditor,
+  editEditor,
+  editorToDocument,
+  type Document,
+} from "~/gen/lexical-rpc";
 
 /**
  * API service for interacting with the backend.
@@ -53,11 +58,17 @@ export function buildEditorPayload(editor: LexicalEditor): EditorPayload {
  * Send editor state to the API.
  * Delegates to the Connect RPC bridge.
  */
-export async function sendEditorState(editor: LexicalEditor): Promise<void> {
-  const id = await saveEditor(editor);
+export async function sendEditorState(
+  editor: LexicalEditor,
+  docId?: bigint,
+): Promise<void> {
+  const isEdit = typeof docId === "bigint" && docId > 0n;
+  const id = isEdit
+    ? await editEditor(editor, docId!)
+    : await saveEditor(editor);
 
   console.group("%c📤 API sendEditorState", "color:#34d399;font-weight:600");
-  console.log("Saved with id:", id);
+  console.log(isEdit ? "Edited" : "Saved", "with id:", id);
   console.groupEnd();
 }
 

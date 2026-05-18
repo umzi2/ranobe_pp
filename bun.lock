@@ -10,6 +10,7 @@
         "@connectrpc/connect": "^2.1.1",
         "@connectrpc/connect-web": "^2.1.1",
         "@kobalte/core": "^0.13.11",
+        "@lexical/history": "0.44.0",
         "@lexical/html": "0.44.0",
         "@lexical/link": "0.44.0",
         "@lexical/rich-text": "^0.44.0",
@@ -212,6 +213,8 @@
     "@lexical/dragon": ["@lexical/dragon@0.44.0", "", { "dependencies": { "@lexical/extension": "0.44.0", "lexical": "0.44.0" } }, "sha512-RhlsjVDket9k1+YFEkDE0/7Qyrh2BI0vxBMzrWwPJTXX/4YFanYN9su8RSabkIukBBJ3QiNOOoC8FKK4Lkr4qg=="],
 
     "@lexical/extension": ["@lexical/extension@0.44.0", "", { "dependencies": { "@lexical/utils": "0.44.0", "@preact/signals-core": "^1.14.1", "lexical": "0.44.0" } }, "sha512-BsYtoc+0EU0pqcOpf/lIUDU6LQVO6zX2AawZoUWJzT3Wzfov23qsqZWvl2WGM9dnRTN5iISJL3Fl53bQVxiXxw=="],
+
+    "@lexical/history": ["@lexical/history@0.44.0", "", { "dependencies": { "@lexical/extension": "0.44.0", "@lexical/utils": "0.44.0", "lexical": "0.44.0" } }, "sha512-RGXcbFTgYL1GIWaReBI26mNSsJTfiA9EAtDY4LBeZ14NrIQhYNokKgNiOxq5Bn8xXrl2+mawQEqoMfgpWp/5YA=="],
 
     "@lexical/html": ["@lexical/html@0.44.0", "", { "dependencies": { "@lexical/extension": "0.44.0", "@lexical/selection": "0.44.0", "@lexical/utils": "0.44.0", "lexical": "0.44.0" } }, "sha512-5X6eGsgwtqPxABsuShUxF7ZfyB/U4GwSEyeonvwH1Vc/5Q2uQVjlB+FAYd+MNwWMHMh4d4+yZ3l70AtIuhr5eg=="],
 

@@ -1,8 +1,12 @@
 import { onMount, onCleanup, Accessor } from "solid-js";
 import { registerRichText } from "@lexical/rich-text";
 import { registerLink, registerClickableLink } from "@lexical/link";
+import { createEmptyHistoryState, registerHistory } from "@lexical/history";
 import { $createParagraphNode, $getRoot, LexicalEditor } from "lexical";
 import { mergeRegister } from "lexical";
+
+/** Shared history state so toolbar can check undo/redo stack */
+export const historyState = createEmptyHistoryState();
 
 export function useRichTextPlugin(
   editor: LexicalEditor,
@@ -41,6 +45,7 @@ export function useRichTextPlugin(
       registerRichText(editor),
       registerLink(editor, linkStores as any),
       registerClickableLink(editor, linkStores as any),
+      registerHistory(editor, historyState, 300),
     );
 
     editor.update(() => {

@@ -37,7 +37,7 @@ export class CommentNode extends ElementNode {
     return this.getLatest().__comment;
   }
 
-  createDOM(_config: EditorConfig, _editor: LexicalEditor): HTMLElement {
+  createDOM(_config: EditorConfig, editor: LexicalEditor): HTMLElement {
     const span = document.createElement("span");
     span.className = "lx-comment";
     span.style.cssText =
@@ -54,7 +54,7 @@ export class CommentNode extends ElementNode {
       if (persistentOpen) return;
       if (hoverTimer) clearTimeout(hoverTimer);
       hoverTimer = setTimeout(() => {
-        showCommentPopover(span, text, false);
+        showCommentPopover(editor, span, text, false);
         hoverTimer = null;
       }, 200);
     });
@@ -65,7 +65,7 @@ export class CommentNode extends ElementNode {
         clearTimeout(hoverTimer);
         hoverTimer = null;
       }
-      hideCommentPopover();
+      hideCommentPopover(editor);
     });
 
     // ── mousedown (capture): prevent Lexical from stealing the selection ──
@@ -90,18 +90,21 @@ export class CommentNode extends ElementNode {
         clearTimeout(hoverTimer);
         hoverTimer = null;
       }
-      hideCommentPopover();
-      showCommentPopover(span, text, true);
+      hideCommentPopover(editor);
+      showCommentPopover(editor, span, text, true);
 
       // Hide on outside click
       const onOutside = (e: MouseEvent) => {
-        const popup = document.querySelector(".lx-comment-popup");
-        if (popup && !popup.contains(e.target as Node) && e.target !== span) {
-          hideCommentPopover();
+        if (e.target === span) return;
+        const state = getPopoverState(editor);
+        const popup = state.activePopover;
+        if (popup && !popup.contains(e.target as Node)) {
+          hideCommentPopover(editor);
           persistentOpen = false;
-          document.removeEventListener("click", onOutside);
         }
       };
+      removeOutsideHandler(editor);
+      getPopoverState(editor).activeOutsideHandler = onOutside;
       setTimeout(() => document.addEventListener("click", onOutside), 0);
     });
 
@@ -140,16 +143,39 @@ export class CommentNode extends ElementNode {
   }
 }
 
-// ── Popover management ──
+// ── Popover management (scoped per editor instance) ──
 
-let activePopover: HTMLElement | null = null;
+interface PopoverState {
+  activePopover: HTMLElement | null;
+  activeOutsideHandler: ((e: MouseEvent) => void) | null;
+}
+
+const popoverStates = new WeakMap<LexicalEditor, PopoverState>();
+
+function getPopoverState(editor: LexicalEditor): PopoverState {
+  let state = popoverStates.get(editor);
+  if (!state) {
+    state = { activePopover: null, activeOutsideHandler: null };
+    popoverStates.set(editor, state);
+  }
+  return state;
+}
+
+function removeOutsideHandler(editor: LexicalEditor): void {
+  const state = getPopoverState(editor);
+  if (state.activeOutsideHandler) {
+    document.removeEventListener("click", state.activeOutsideHandler);
+    state.activeOutsideHandler = null;
+  }
+}
 
 function showCommentPopover(
+  editor: LexicalEditor,
   anchor: HTMLElement,
   text: string,
   persistent: boolean,
 ): void {
-  hideCommentPopover();
+  hideCommentPopover(editor);
 
   const popup = document.createElement("div");
   popup.className = "lx-comment-popup";
@@ -173,14 +199,14 @@ function showCommentPopover(
     close.textContent = "✕";
     close.addEventListener("click", (e) => {
       e.stopPropagation();
-      hideCommentPopover();
+      hideCommentPopover(editor);
     });
     popup.appendChild(close);
   }
 
   // Append first so we can measure the popup height for smart positioning
   document.body.appendChild(popup);
-  activePopover = popup;
+  getPopoverState(editor).activePopover = popup;
 
   // Smart position — checks available space above / below
   positionPopover(popup, anchor);
@@ -235,10 +261,12 @@ function positionPopover(popup: HTMLElement, anchor: HTMLElement): void {
   }
 }
 
-function hideCommentPopover(): void {
-  if (activePopover) {
-    activePopover.remove();
-    activePopover = null;
+function hideCommentPopover(editor: LexicalEditor): void {
+  removeOutsideHandler(editor);
+  const state = getPopoverState(editor);
+  if (state.activePopover) {
+    state.activePopover.remove();
+    state.activePopover = null;
   }
 }
 

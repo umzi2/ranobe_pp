@@ -4,11 +4,12 @@
 // @ts-nocheck
 
 import {
-  Document,
   DocumentRequest,
   AWSPutRequest,
   AWSPutResponse,
-} from "./document_pb.js";
+  CreateDocumetnRequest,
+  EditDocumentRequest,
+} from "./gen/document_pb";
 import { MethodKind } from "@bufbuild/protobuf";
 
 /**
@@ -49,7 +50,16 @@ export const DocumentSaveService = {
      */
     save: {
       name: "Save",
-      I: Document,
+      I: CreateDocumetnRequest,
+      O: DocumentRequest,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * @generated from rpc doc.DocumentSaveService.Edit
+     */
+    edit: {
+      name: "Edit",
+      I: EditDocumentRequest,
       O: DocumentRequest,
       kind: MethodKind.Unary,
     },

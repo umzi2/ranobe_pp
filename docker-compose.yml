@@ -1,0 +1,45 @@
+# ──────────────────────────────────────────────────────────
+# docker-compose.yml
+#
+# Запускает оба приложения:
+#   - editor (ranobe_pp)  → http://localhost:3000
+#   - viewer (viewer-site) → http://localhost:3001
+#
+# Бэкенд ожидается на http://localhost:8080 (меняется через
+# переменную VITE_BACKEND_URL при сборке).
+#
+# Сборка:
+#   docker compose build --build-arg VITE_BACKEND_URL=http://backend:8080
+#
+# Запуск:
+#   docker compose up -d
+# ──────────────────────────────────────────────────────────
+
+services:
+  editor:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        VITE_BACKEND_URL: ${VITE_BACKEND_URL:-http://localhost:8080}
+    ports:
+      - "3000:80"
+    restart: unless-stopped
+    networks:
+      - ranobe
+
+  viewer:
+    build:
+      context: ./viewer-site
+      dockerfile: Dockerfile
+      args:
+        VITE_BACKEND_URL: ${VITE_BACKEND_URL:-http://localhost:8080}
+    ports:
+      - "3001:80"
+    restart: unless-stopped
+    networks:
+      - ranobe
+
+networks:
+  ranobe:
+    driver: bridge

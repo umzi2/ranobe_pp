@@ -16,6 +16,7 @@ import {
   HeadingDataSchema,
   ListDataSchema,
   LinkDataSchema,
+  CommentDataSchema,
   type Document,
   type Node,
 } from "~/gen/document_pb";
@@ -38,13 +39,14 @@ const LEXICAL_TYPE_TO_PROTO: Record<string, NodeType> = {
   text: NodeType.NODE_TEXT,
   heading: NodeType.NODE_HEADING,
   image: NodeType.NODE_IMAGE,
-  horizontalrule: NodeType.NODE_HORIZONTAL_RULE,
+  "horizontal-rule": NodeType.NODE_HORIZONTAL_RULE,
   quote: NodeType.NODE_QUOTE,
   code: NodeType.NODE_CODE,
   list: NodeType.NODE_LIST,
   listitem: NodeType.NODE_LIST_ITEM,
   link: NodeType.NODE_LINK,
   linebreak: NodeType.NODE_LINE_BREAK,
+  comment: NodeType.NODE_COMMENT,
 };
 
 const PROTO_TO_LEXICAL_TYPE: Record<number, string> = {};
@@ -200,6 +202,14 @@ function convertNode(lex: LexicalNode): Node {
         }),
       };
       break;
+    case NodeType.NODE_COMMENT:
+      base.data = {
+        case: "comment",
+        value: create(CommentDataSchema, {
+          commentText: String(rest.commentText ?? ""),
+        }),
+      };
+      break;
   }
 
   return base;
@@ -253,6 +263,8 @@ function convertProtoNode(p: Node): LexicalNode {
     node.rel = p.data.value.rel;
     node.target = p.data.value.target;
     node.title = p.data.value.title;
+  } else if (p.data.case === "comment" && p.data.value) {
+    node.commentText = p.data.value.commentText;
   }
 
   if (p.children.length > 0) {

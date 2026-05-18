@@ -9,11 +9,14 @@ import type { ImageDragDropParams } from "./plugins/imageUploadPipeline";
 import { onMount, onCleanup } from "solid-js";
 import { $isImageNode } from "./nodes/ImageNode";
 import { $isHorizontalRuleNode } from "./nodes/HorizontalRuleNode";
+import { useLocalStoragePersistence } from "./plugins/useLocalStoragePersistence";
 import { logEditorState } from "~/services/api";
 import "./LexicalEditor.scss";
 
 export interface LexicalEditorProps {
   chapterParams?: ImageDragDropParams;
+  /** Вызывается при Ctrl+S */
+  onSave?: () => void;
 }
 
 export function LexicalEditor(props: LexicalEditorProps) {
@@ -90,10 +93,30 @@ export function LexicalEditor(props: LexicalEditorProps) {
     onCleanup(unreg);
   });
 
-  // Debug: log editor state on every update (via API service)
+  // Persist editor state to localStorage
+  const storageKey = props.chapterParams
+    ? `${props.chapterParams.teamId}-${props.chapterParams.titleId}-${props.chapterParams.chapterId}`
+    : "draft";
+  useLocalStoragePersistence(editor, storageKey);
+
+  // Ctrl+S → onSave
   onMount(() => {
-    const unregister = logEditorState(editor);
-    onCleanup(unregister);
+    const handler = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === "s") {
+        e.preventDefault();
+        props.onSave?.();
+      }
+    };
+    document.addEventListener("keydown", handler);
+    onCleanup(() => document.removeEventListener("keydown", handler));
+  });
+
+  // Debug: log editor state on every update (dev only)
+  onMount(() => {
+    if (import.meta.env.DEV) {
+      const unregister = logEditorState(editor);
+      onCleanup(unregister);
+    }
   });
 
   return (

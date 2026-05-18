@@ -483,7 +483,7 @@ function removeDuplicateImages() {
 
 function sweepAndUploadImages(editor: LexicalEditor, p: ImageDragDropParams) {
   const nonCdn: Array<{ key: string; src: string }> = [];
-  editor.update(() => {
+  editor.getEditorState().read(() => {
     function walk(n: any) {
       if (n instanceof ImageNode) {
         const src = n.__src;

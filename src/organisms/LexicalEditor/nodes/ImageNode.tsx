@@ -78,6 +78,14 @@ export class ImageNode extends DecoratorNode<null> {
     this.__widthType = widthType;
   }
 
+  getSrc(): string {
+    return this.getLatest().__src;
+  }
+  setSrc(src: string): void {
+    const s = this.getWritable();
+    s.__src = src;
+  }
+
   getAlignment(): ImageAlignment {
     return this.getLatest().__alignment;
   }
@@ -117,9 +125,20 @@ export class ImageNode extends DecoratorNode<null> {
         break;
       case "img-percent": {
         const nw = img.naturalWidth;
-        if (nw > 0)
+        if (nw > 0) {
           img.style.width = `${Math.round((nw * this.__width) / 100)}px`;
-        else img.style.width = "";
+        } else {
+          // Image not yet loaded — defer sizing until it loads
+          img.style.width = "";
+          const onLoad = () => {
+            const loadedW = img.naturalWidth;
+            if (loadedW > 0) {
+              img.style.width = `${Math.round((loadedW * this.__width) / 100)}px`;
+            }
+            img.removeEventListener("load", onLoad);
+          };
+          img.addEventListener("load", onLoad);
+        }
         img.style.height = "auto";
         break;
       }
@@ -171,27 +190,37 @@ export class ImageNode extends DecoratorNode<null> {
   // ─────────────────────────────────────────────────────────────────────────
 
   /** (re)build the toolbar to reflect current state */
-  private syncToolbar(toolbar: HTMLElement): void {
-    const self = this;
+  private syncToolbar(
+    toolbar: HTMLElement,
+    overrides?: {
+      alignment?: ImageAlignment;
+      width?: number;
+      widthType?: ImageWidthType;
+    },
+  ): void {
+    // Используем переданные значения (из event handler, вне editor.update)
+    // либо поля текущей ноды (из updateDOM, где this — уже свежая нода)
+    const align = overrides?.alignment ?? this.__alignment;
+    const width = overrides?.width ?? this.__width;
+    const widthType = overrides?.widthType ?? this.__widthType;
 
     // ── alignment buttons ──
     const alignBtns =
       toolbar.querySelectorAll<HTMLButtonElement>(".lx-itb-align");
     for (const btn of alignBtns) {
-      btn.classList.toggle("pressed", btn.dataset.align === this.__alignment);
+      btn.classList.toggle("pressed", btn.dataset.align === align);
     }
 
     // ── width input ──
     const widthInput = toolbar.querySelector<HTMLInputElement>(".lx-itb-input");
     if (widthInput) {
-      widthInput.value = this.__width > 0 ? String(this.__width) : "";
-      const max = this.__widthType === "block-percent" ? 100 : 99999;
-      widthInput.max = String(max);
+      widthInput.value = width > 0 ? String(width) : "";
+      widthInput.max = String(widthType === "block-percent" ? 100 : 99999);
     }
 
     // ── unit select ──
     const unitSel = toolbar.querySelector<HTMLSelectElement>(".lx-itb-select");
-    if (unitSel) unitSel.value = this.__widthType;
+    if (unitSel) unitSel.value = widthType;
   }
 
   /** Create the inline toolbar element (hidden by default, shown via .lx-image-selected) */
@@ -219,7 +248,7 @@ export class ImageNode extends DecoratorNode<null> {
         editor.update(() => {
           self.setAlignment(a.value);
         });
-        self.syncToolbar(tb);
+        self.syncToolbar(tb, { alignment: a.value });
       });
       alignGroup.appendChild(btn);
     }
@@ -243,6 +272,7 @@ export class ImageNode extends DecoratorNode<null> {
       editor.update(() => {
         self.setWidth(val);
       });
+      self.syncToolbar(tb, { width: val });
     };
 
     wInput.addEventListener("input", updateWidth);
@@ -257,6 +287,7 @@ export class ImageNode extends DecoratorNode<null> {
       editor.update(() => {
         self.setWidth(next);
       });
+      self.syncToolbar(tb, { width: next });
     };
 
     // vertical spinners container (right side of input)
@@ -304,6 +335,7 @@ export class ImageNode extends DecoratorNode<null> {
       editor.update(() => {
         self.setWidthType(val);
       });
+      self.syncToolbar(tb, { widthType: val });
     });
     wGroup.appendChild(wSelect);
     tb.appendChild(wGroup);

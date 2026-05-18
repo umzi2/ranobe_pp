@@ -76,7 +76,7 @@ export async function retryImageLoad(
     console.log(`🔄 Retry ${i}/${maxRetries}`);
     editor.update(() => {
       const n = $getNodeByKey(nodeKey);
-      if (n instanceof ImageNode) n.getWritable().__src = busted;
+      if (n instanceof ImageNode) n.setSrc(busted);
     });
     await new Promise((r) => setTimeout(r, delayMs));
     const imgEl = editor
@@ -85,7 +85,7 @@ export async function retryImageLoad(
     if (imgEl && imgEl.naturalWidth > 0) {
       editor.update(() => {
         const n = $getNodeByKey(nodeKey);
-        if (n instanceof ImageNode) n.getWritable().__src = cdnSrc;
+        if (n instanceof ImageNode) n.setSrc(cdnSrc);
       });
       console.log(`✅ Image loaded (attempt ${i})`);
       return;
@@ -155,6 +155,24 @@ export async function uploadImageToCdn(
       if (nodeKey) retryImageLoad(editor, nodeKey, cdnSrc);
     } catch (err) {
       console.error("Upload failed:", err);
+      // Remove the orphan ImageNode — the upload never completed
+      if (nodeKey) {
+        editor.update(() => {
+          const n = $getNodeByKey(nodeKey);
+          if (n) {
+            const next = n.getNextSibling();
+            n.remove();
+            // Clean up the empty paragraph that was inserted after the image
+            if (
+              next &&
+              next.getTextContent().length === 0 &&
+              (next as any).getChildren?.()?.length === 0
+            ) {
+              next.remove();
+            }
+          }
+        });
+      }
     }
   })();
 }

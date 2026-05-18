@@ -1,0 +1,107 @@
+@use "~/styles/variables" as *;
+
+.previewPanel {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    overflow: hidden;
+    border-radius: $radius-xl;
+    background: $color-bg-elevated;
+    border: 1px solid $color-border;
+    margin-top: $space-4;
+}
+
+.previewHeader {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: $space-2;
+    padding: $space-2 $space-4;
+    background: $color-bg-elevated;
+    border-bottom: 1px solid $color-border;
+    user-select: none;
+    flex-wrap: wrap;
+}
+
+.previewTitle {
+    font-size: $text-sm;
+    font-weight: $fw-semibold;
+    color: $color-text-muted;
+    white-space: nowrap;
+}
+
+.previewActions {
+    display: flex;
+    align-items: center;
+    gap: $space-2;
+    flex-wrap: wrap;
+}
+
+.idInput {
+    width: 120px;
+    padding: $space-1 $space-2;
+    font-size: $text-sm;
+    font-family: $font-family;
+    color: $color-text;
+    background: $color-bg;
+    border: 1px solid $color-border;
+    border-radius: $radius-sm;
+    outline: none;
+    transition: border-color $transition-fast;
+
+    &:focus {
+        border-color: $color-border-focus;
+    }
+
+    &::placeholder {
+        color: $color-text-faint;
+    }
+}
+
+.actionBtn {
+    padding: $space-1 $space-3;
+    font-size: $text-sm;
+    font-weight: $fw-medium;
+    font-family: $font-family;
+    color: $color-text;
+    background: $color-bg;
+    border: 1px solid $color-border;
+    border-radius: $radius-sm;
+    cursor: pointer;
+    transition: all $transition-fast;
+    white-space: nowrap;
+
+    &:hover:not(:disabled) {
+        background: $color-bg-hover;
+        border-color: $color-border-focus;
+    }
+
+    &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+}
+
+.previewError {
+    flex: 0 0 auto;
+    padding: $space-2 $space-4;
+    font-size: $text-sm;
+    color: $color-danger;
+    background: rgba($color-danger, 0.1);
+    border-bottom: 1px solid $color-border;
+}
+
+.previewContent {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    overflow-x: clip;
+    position: relative;
+    max-height: 60vh;
+    transition: opacity $transition-base;
+}
+
+.previewLoading {
+    opacity: 0.5;
+    pointer-events: none;
+}

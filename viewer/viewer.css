@@ -1,0 +1,268 @@
+/* ════════════════════════════════════════════════════════
+   viewer.css — полностью самодостаточные стили.
+
+   Скопированы из SCSS-переменных проекта в чистый CSS.
+   Зависимость только от public/fonts (шрифты).
+   ════════════════════════════════════════════════════════ */
+
+@font-face {
+    font-family: "Tilda Sans";
+    src: url("/fonts/tildasans/TildaSans-Light.woff2") format("woff2");
+    font-weight: 300;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Tilda Sans";
+    src: url("/fonts/tildasans/TildaSans-Regular.woff2") format("woff2");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Tilda Sans";
+    src: url("/fonts/tildasans/TildaSans-Medium.woff2") format("woff2");
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Tilda Sans";
+    src: url("/fonts/tildasans/TildaSans-Semibold.woff2") format("woff2");
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Tilda Sans";
+    src: url("/fonts/tildasans/TildaSans-Bold.woff2") format("woff2");
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Tilda Sans";
+    src: url("/fonts/tildasans/TildaSans-ExtraBold.woff2") format("woff2");
+    font-weight: 800;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Tilda Sans";
+    src: url("/fonts/tildasans/TildaSans-Black.woff2") format("woff2");
+    font-weight: 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* ──── Viewer Root ──── */
+
+.vv-root {
+    font-family: "Tilda Sans", sans-serif;
+    font-weight: 400;
+    font-size: 1rem;
+    line-height: 1.6;
+    color: #e2e4ed;
+    background: #343c52;
+    -webkit-font-smoothing: antialiased;
+    padding: 16px 24px;
+    border-radius: 12px;
+}
+
+.vv-root *,
+.vv-root *::before,
+.vv-root *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+/* ──── Headings ──── */
+
+.vv-root h1,
+.vv-root h2,
+.vv-root h3,
+.vv-root h4 {
+    color: #e2e4ed;
+    line-height: 1.3;
+    font-weight: 600;
+}
+
+.vv-root h1 {
+    font-size: 1.5rem;
+    margin: 16px 0 8px;
+}
+
+.vv-root h2 {
+    font-size: 1.25rem;
+    margin: 14px 0 6px;
+}
+
+.vv-root h3 {
+    font-size: 1.125rem;
+    margin: 12px 0 4px;
+}
+
+.vv-root h4 {
+    font-size: 1rem;
+    margin: 10px 0 4px;
+}
+
+/* ──── Paragraph ──── */
+
+.vv-root p {
+    color: #e2e4ed;
+    margin-bottom: 8px;
+}
+
+/* ──── Inline text formatting ──── */
+
+.vv-text-bold {
+    font-weight: 700;
+}
+
+.vv-text-italic {
+    font-style: italic;
+}
+
+.vv-text-strikethrough {
+    text-decoration: line-through;
+}
+
+.vv-text-underline {
+    text-decoration: underline;
+}
+
+.vv-text-code {
+    font-family: "Courier New", Courier, monospace;
+    background: #222535;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.9em;
+    color: #e2e4ed;
+}
+
+.vv-text-subscript {
+    vertical-align: sub;
+    font-size: 0.75em;
+}
+
+.vv-text-superscript {
+    vertical-align: super;
+    font-size: 0.75em;
+}
+
+/* ──── Link ──── */
+
+.vv-root a {
+    color: #4f46e5;
+    text-decoration: none;
+    transition: color 100ms ease;
+}
+
+.vv-root a:hover {
+    color: #4338ca;
+}
+
+/* ──── Image ──── */
+
+.vv-image-wrapper {
+    display: flex;
+    margin: 12px 0;
+}
+
+.vv-image-wrapper img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+}
+
+.vv-image-align-left {
+    justify-content: flex-start;
+}
+
+.vv-image-align-center {
+    justify-content: center;
+}
+
+.vv-image-align-right {
+    justify-content: flex-end;
+}
+
+/* ──── Quote ──── */
+
+.vv-quote {
+    border-left: 4px solid #4f46e5;
+    padding: 12px 16px;
+    margin: 12px 0;
+    background: #222535;
+    border-radius: 0 8px 8px 0;
+    color: #e2e4ed;
+    font-style: italic;
+}
+
+/* ──── Code block ──── */
+
+.vv-code {
+    display: block;
+    background: #1b1f2a;
+    padding: 16px;
+    border-radius: 8px;
+    margin: 12px 0;
+    font-family: "Courier New", Courier, monospace;
+    font-size: 0.9em;
+    white-space: pre-wrap;
+    overflow-x: auto;
+    color: #e2e4ed;
+    border: 1px solid #2a2d3e;
+}
+
+/* ──── List ──── */
+
+.vv-root ul,
+.vv-root ol {
+    margin: 8px 0 8px 24px;
+    color: #e2e4ed;
+}
+
+.vv-root li {
+    margin-bottom: 4px;
+}
+
+/* ──── Horizontal Rule ──── */
+
+.vv-hr {
+    border: none;
+    border-top: 2px solid #2a2d3e;
+    margin: 16px 0;
+}
+
+/* ──── Line Break ──── */
+
+.vv-line-break {
+    display: block;
+}
+
+/* ──── Alignment helpers ──── */
+
+.vv-align-left {
+    text-align: left;
+}
+
+.vv-align-center {
+    text-align: center;
+}
+
+.vv-align-right {
+    text-align: right;
+}
+
+.vv-align-justify {
+    text-align: justify;
+}

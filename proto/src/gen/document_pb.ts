@@ -10,7 +10,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file document.proto.
  */
 export const file_document: GenFile = /*@__PURE__*/
-  fileDesc("Cg5kb2N1bWVudC5wcm90bxIDZG9jIogBCghEb2N1bWVudBIPCgd2ZXJzaW9uGAEgASgJEiUKBG1ldGEYAiADKAsyFy5kb2MuRG9jdW1lbnQuTWV0YUVudHJ5EhcKBHJvb3QYAyABKAsyCS5kb2MuTm9kZRorCglNZXRhRW50cnkSCwoDa2V5GAEgASgJEg0KBXZhbHVlGAIgASgJOgI4ASLPAgoETm9kZRIbCgR0eXBlGAEgASgOMg0uZG9jLk5vZGVUeXBlEg8KB3ZlcnNpb24YAiABKAUSIwoFYXR0cnMYAyADKAsyFC5kb2MuTm9kZS5BdHRyc0VudHJ5EhsKCGNoaWxkcmVuGAQgAygLMgkuZG9jLk5vZGUSHQoEdGV4dBgKIAEoCzINLmRvYy5UZXh0RGF0YUgAEh8KBWltYWdlGAsgASgLMg4uZG9jLkltYWdlRGF0YUgAEiMKB2hlYWRpbmcYDCABKAsyEC5kb2MuSGVhZGluZ0RhdGFIABIdCgRsaXN0GA0gASgLMg0uZG9jLkxpc3REYXRhSAASHQoEbGluaxgOIAEoCzINLmRvYy5MaW5rRGF0YUgAGiwKCkF0dHJzRW50cnkSCwoDa2V5GAEgASgJEg0KBXZhbHVlGAIgASgJOgI4AUIGCgRkYXRhIlUKCFRleHREYXRhEgwKBHRleHQYASABKAkSDgoGZm9ybWF0GAIgASgNEg4KBmRldGFpbBgDIAEoDRIMCgRtb2RlGAQgASgJEg0KBXN0eWxlGAUgASgJImsKCUltYWdlRGF0YRILCgNzcmMYASABKAkSCwoDYWx0GAIgASgJEiEKCWFsaWdubWVudBgDIAEoDjIOLmRvYy5BbGlnbm1lbnQSDQoFd2lkdGgYBCABKA0SEgoKd2lkdGhfdHlwZRgFIAEoCSIrCgtIZWFkaW5nRGF0YRIcCgN0YWcYASABKA4yDy5kb2MuSGVhZGluZ1RhZyI9CghMaXN0RGF0YRIPCgdvcmRlcmVkGAEgASgIEg0KBXN0YXJ0GAIgASgNEhEKCWxpc3RfdHlwZRgDIAEoCSJDCghMaW5rRGF0YRILCgN1cmwYASABKAkSCwoDcmVsGAIgASgJEg4KBnRhcmdldBgDIAEoCRINCgV0aXRsZRgEIAEoCSIdCg9Eb2N1bWVudFJlcXVlc3QSCgoCaWQYASABKAMiRgoNQVdTUHV0UmVxdWVzdBIPCgd0ZWFtX2lkGAEgASgFEhAKCHRpdGxlX2lkGAIgASgFEhIKCmNoYXB0ZXJfaWQYAyABKAUiKQoOQVdTUHV0UmVzcG9uc2USCwoDdXJsGAEgASgJEgoKAmlkGAIgASgJKvQBCghOb2RlVHlwZRIUChBOT0RFX1VOU1BFQ0lGSUVEEAASDQoJTk9ERV9ST09UEAESEgoOTk9ERV9QQVJBR1JBUEgQAhINCglOT0RFX1RFWFQQAxIQCgxOT0RFX0hFQURJTkcQBBIOCgpOT0RFX0lNQUdFEAUSGAoUTk9ERV9IT1JJWk9OVEFMX1JVTEUQBhIOCgpOT0RFX1FVT1RFEAcSDQoJTk9ERV9DT0RFEAgSDQoJTk9ERV9MSVNUEAkSEgoOTk9ERV9MSVNUX0lURU0QChINCglOT0RFX0xJTksQCxITCg9OT0RFX0xJTkVfQlJFQUsQDCqFAQoKSGVhZGluZ1RhZxIXChNIRUFESU5HX1VOU1BFQ0lGSUVEEAASDgoKSEVBRElOR19IMRABEg4KCkhFQURJTkdfSDIQAhIOCgpIRUFESU5HX0gzEAMSDgoKSEVBRElOR19INBAEEg4KCkhFQURJTkdfSDUQBRIOCgpIRUFESU5HX0g2EAYqZAoJQWxpZ25tZW50EhEKDUFMSUdOX0lOSEVSSVQQABIOCgpBTElHTl9MRUZUEAESEAoMQUxJR05fQ0VOVEVSEAISDwoLQUxJR05fUklHSFQQAxIRCg1BTElHTl9KVVNUSUZZEAQydQoTRG9jdW1lbnRSZWFkU2VydmljZRIrCgRSZWFkEhQuZG9jLkRvY3VtZW50UmVxdWVzdBoNLmRvYy5Eb2N1bWVudBIxCgZHZXRBd3MSEi5kb2MuQVdTUHV0UmVxdWVzdBoTLmRvYy5BV1NQdXRSZXNwb25zZTJCChNEb2N1bWVudFNhdmVTZXJ2aWNlEisKBFNhdmUSDS5kb2MuRG9jdW1lbnQaFC5kb2MuRG9jdW1lbnRSZXF1ZXN0YgZwcm90bzM");
+  fileDesc("Cg5kb2N1bWVudC5wcm90bxIDZG9jIogBCghEb2N1bWVudBIPCgd2ZXJzaW9uGAEgASgJEiUKBG1ldGEYAiADKAsyFy5kb2MuRG9jdW1lbnQuTWV0YUVudHJ5EhcKBHJvb3QYAyABKAsyCS5kb2MuTm9kZRorCglNZXRhRW50cnkSCwoDa2V5GAEgASgJEg0KBXZhbHVlGAIgASgJOgI4ASL0AgoETm9kZRIbCgR0eXBlGAEgASgOMg0uZG9jLk5vZGVUeXBlEg8KB3ZlcnNpb24YAiABKAUSIwoFYXR0cnMYAyADKAsyFC5kb2MuTm9kZS5BdHRyc0VudHJ5EhsKCGNoaWxkcmVuGAQgAygLMgkuZG9jLk5vZGUSHQoEdGV4dBgKIAEoCzINLmRvYy5UZXh0RGF0YUgAEh8KBWltYWdlGAsgASgLMg4uZG9jLkltYWdlRGF0YUgAEiMKB2hlYWRpbmcYDCABKAsyEC5kb2MuSGVhZGluZ0RhdGFIABIdCgRsaXN0GA0gASgLMg0uZG9jLkxpc3REYXRhSAASHQoEbGluaxgOIAEoCzINLmRvYy5MaW5rRGF0YUgAEiMKB2NvbW1lbnQYDyABKAsyEC5kb2MuQ29tbWVudERhdGFIABosCgpBdHRyc0VudHJ5EgsKA2tleRgBIAEoCRINCgV2YWx1ZRgCIAEoCToCOAFCBgoEZGF0YSIjCgtDb21tZW50RGF0YRIUCgxjb21tZW50X3RleHQYASABKAkiVQoIVGV4dERhdGESDAoEdGV4dBgBIAEoCRIOCgZmb3JtYXQYAiABKA0SDgoGZGV0YWlsGAMgASgNEgwKBG1vZGUYBCABKAkSDQoFc3R5bGUYBSABKAkiawoJSW1hZ2VEYXRhEgsKA3NyYxgBIAEoCRILCgNhbHQYAiABKAkSIQoJYWxpZ25tZW50GAMgASgOMg4uZG9jLkFsaWdubWVudBINCgV3aWR0aBgEIAEoDRISCgp3aWR0aF90eXBlGAUgASgJIisKC0hlYWRpbmdEYXRhEhwKA3RhZxgBIAEoDjIPLmRvYy5IZWFkaW5nVGFnIj0KCExpc3REYXRhEg8KB29yZGVyZWQYASABKAgSDQoFc3RhcnQYAiABKA0SEQoJbGlzdF90eXBlGAMgASgJIkMKCExpbmtEYXRhEgsKA3VybBgBIAEoCRILCgNyZWwYAiABKAkSDgoGdGFyZ2V0GAMgASgJEg0KBXRpdGxlGAQgASgJIh0KD0RvY3VtZW50UmVxdWVzdBIKCgJpZBgBIAEoAyJXCg1BV1NQdXRSZXF1ZXN0Eg8KB3RlYW1faWQYASABKAUSEAoIdGl0bGVfaWQYAiABKAUSEgoKY2hhcHRlcl9pZBgDIAEoBRIPCgdhcGlfa2V5GAQgASgJIikKDkFXU1B1dFJlc3BvbnNlEgsKA3VybBgBIAEoCRIKCgJpZBgCIAEoCSJJChVDcmVhdGVEb2N1bWV0blJlcXVlc3QSDwoHYXBpX2tleRgBIAEoCRIfCghkb2N1bWVudBgCIAEoCzINLmRvYy5Eb2N1bWVudCJTChNFZGl0RG9jdW1lbnRSZXF1ZXN0EgoKAmlkGAEgASgDEh8KCGRvY3VtZW50GAIgASgLMg0uZG9jLkRvY3VtZW50Eg8KB2FwaV9rZXkYAyABKAkqhgIKCE5vZGVUeXBlEhQKEE5PREVfVU5TUEVDSUZJRUQQABINCglOT0RFX1JPT1QQARISCg5OT0RFX1BBUkFHUkFQSBACEg0KCU5PREVfVEVYVBADEhAKDE5PREVfSEVBRElORxAEEg4KCk5PREVfSU1BR0UQBRIYChROT0RFX0hPUklaT05UQUxfUlVMRRAGEg4KCk5PREVfUVVPVEUQBxINCglOT0RFX0NPREUQCBINCglOT0RFX0xJU1QQCRISCg5OT0RFX0xJU1RfSVRFTRAKEg0KCU5PREVfTElOSxALEhMKD05PREVfTElORV9CUkVBSxAMEhAKDE5PREVfQ09NTUVOVBANKoUBCgpIZWFkaW5nVGFnEhcKE0hFQURJTkdfVU5TUEVDSUZJRUQQABIOCgpIRUFESU5HX0gxEAESDgoKSEVBRElOR19IMhACEg4KCkhFQURJTkdfSDMQAxIOCgpIRUFESU5HX0g0EAQSDgoKSEVBRElOR19INRAFEg4KCkhFQURJTkdfSDYQBipkCglBbGlnbm1lbnQSEQoNQUxJR05fSU5IRVJJVBAAEg4KCkFMSUdOX0xFRlQQARIQCgxBTElHTl9DRU5URVIQAhIPCgtBTElHTl9SSUdIVBADEhEKDUFMSUdOX0pVU1RJRlkQBDJ1ChNEb2N1bWVudFJlYWRTZXJ2aWNlEisKBFJlYWQSFC5kb2MuRG9jdW1lbnRSZXF1ZXN0Gg0uZG9jLkRvY3VtZW50EjEKBkdldEF3cxISLmRvYy5BV1NQdXRSZXF1ZXN0GhMuZG9jLkFXU1B1dFJlc3BvbnNlMocBChNEb2N1bWVudFNhdmVTZXJ2aWNlEjgKBFNhdmUSGi5kb2MuQ3JlYXRlRG9jdW1ldG5SZXF1ZXN0GhQuZG9jLkRvY3VtZW50UmVxdWVzdBI2CgRFZGl0EhguZG9jLkVkaXREb2N1bWVudFJlcXVlc3QaFC5kb2MuRG9jdW1lbnRSZXF1ZXN0YgZwcm90bzM");
 
 /**
  * @generated from message doc.Document
@@ -96,6 +96,12 @@ export type Node = Message<"doc.Node"> & {
      */
     value: LinkData;
     case: "link";
+  } | {
+    /**
+     * @generated from field: doc.CommentData comment = 15;
+     */
+    value: CommentData;
+    case: "comment";
   } | { case: undefined; value?: undefined };
 };
 
@@ -105,6 +111,23 @@ export type Node = Message<"doc.Node"> & {
  */
 export const NodeSchema: GenMessage<Node> = /*@__PURE__*/
   messageDesc(file_document, 1);
+
+/**
+ * @generated from message doc.CommentData
+ */
+export type CommentData = Message<"doc.CommentData"> & {
+  /**
+   * @generated from field: string comment_text = 1;
+   */
+  commentText: string;
+};
+
+/**
+ * Describes the message doc.CommentData.
+ * Use `create(CommentDataSchema)` to create a new message.
+ */
+export const CommentDataSchema: GenMessage<CommentData> = /*@__PURE__*/
+  messageDesc(file_document, 2);
 
 /**
  * @generated from message doc.TextData
@@ -141,7 +164,7 @@ export type TextData = Message<"doc.TextData"> & {
  * Use `create(TextDataSchema)` to create a new message.
  */
 export const TextDataSchema: GenMessage<TextData> = /*@__PURE__*/
-  messageDesc(file_document, 2);
+  messageDesc(file_document, 3);
 
 /**
  * @generated from message doc.ImageData
@@ -178,7 +201,7 @@ export type ImageData = Message<"doc.ImageData"> & {
  * Use `create(ImageDataSchema)` to create a new message.
  */
 export const ImageDataSchema: GenMessage<ImageData> = /*@__PURE__*/
-  messageDesc(file_document, 3);
+  messageDesc(file_document, 4);
 
 /**
  * @generated from message doc.HeadingData
@@ -195,7 +218,7 @@ export type HeadingData = Message<"doc.HeadingData"> & {
  * Use `create(HeadingDataSchema)` to create a new message.
  */
 export const HeadingDataSchema: GenMessage<HeadingData> = /*@__PURE__*/
-  messageDesc(file_document, 4);
+  messageDesc(file_document, 5);
 
 /**
  * @generated from message doc.ListData
@@ -222,7 +245,7 @@ export type ListData = Message<"doc.ListData"> & {
  * Use `create(ListDataSchema)` to create a new message.
  */
 export const ListDataSchema: GenMessage<ListData> = /*@__PURE__*/
-  messageDesc(file_document, 5);
+  messageDesc(file_document, 6);
 
 /**
  * @generated from message doc.LinkData
@@ -254,7 +277,7 @@ export type LinkData = Message<"doc.LinkData"> & {
  * Use `create(LinkDataSchema)` to create a new message.
  */
 export const LinkDataSchema: GenMessage<LinkData> = /*@__PURE__*/
-  messageDesc(file_document, 6);
+  messageDesc(file_document, 7);
 
 /**
  * @generated from message doc.DocumentRequest
@@ -271,7 +294,7 @@ export type DocumentRequest = Message<"doc.DocumentRequest"> & {
  * Use `create(DocumentRequestSchema)` to create a new message.
  */
 export const DocumentRequestSchema: GenMessage<DocumentRequest> = /*@__PURE__*/
-  messageDesc(file_document, 7);
+  messageDesc(file_document, 8);
 
 /**
  * @generated from message doc.AWSPutRequest
@@ -291,6 +314,11 @@ export type AWSPutRequest = Message<"doc.AWSPutRequest"> & {
    * @generated from field: int32 chapter_id = 3;
    */
   chapterId: number;
+
+  /**
+   * @generated from field: string api_key = 4;
+   */
+  apiKey: string;
 };
 
 /**
@@ -298,7 +326,7 @@ export type AWSPutRequest = Message<"doc.AWSPutRequest"> & {
  * Use `create(AWSPutRequestSchema)` to create a new message.
  */
 export const AWSPutRequestSchema: GenMessage<AWSPutRequest> = /*@__PURE__*/
-  messageDesc(file_document, 8);
+  messageDesc(file_document, 9);
 
 /**
  * @generated from message doc.AWSPutResponse
@@ -320,7 +348,56 @@ export type AWSPutResponse = Message<"doc.AWSPutResponse"> & {
  * Use `create(AWSPutResponseSchema)` to create a new message.
  */
 export const AWSPutResponseSchema: GenMessage<AWSPutResponse> = /*@__PURE__*/
-  messageDesc(file_document, 9);
+  messageDesc(file_document, 10);
+
+/**
+ * @generated from message doc.CreateDocumetnRequest
+ */
+export type CreateDocumetnRequest = Message<"doc.CreateDocumetnRequest"> & {
+  /**
+   * @generated from field: string api_key = 1;
+   */
+  apiKey: string;
+
+  /**
+   * @generated from field: doc.Document document = 2;
+   */
+  document?: Document | undefined;
+};
+
+/**
+ * Describes the message doc.CreateDocumetnRequest.
+ * Use `create(CreateDocumetnRequestSchema)` to create a new message.
+ */
+export const CreateDocumetnRequestSchema: GenMessage<CreateDocumetnRequest> = /*@__PURE__*/
+  messageDesc(file_document, 11);
+
+/**
+ * @generated from message doc.EditDocumentRequest
+ */
+export type EditDocumentRequest = Message<"doc.EditDocumentRequest"> & {
+  /**
+   * @generated from field: int64 id = 1;
+   */
+  id: bigint;
+
+  /**
+   * @generated from field: doc.Document document = 2;
+   */
+  document?: Document | undefined;
+
+  /**
+   * @generated from field: string api_key = 3;
+   */
+  apiKey: string;
+};
+
+/**
+ * Describes the message doc.EditDocumentRequest.
+ * Use `create(EditDocumentRequestSchema)` to create a new message.
+ */
+export const EditDocumentRequestSchema: GenMessage<EditDocumentRequest> = /*@__PURE__*/
+  messageDesc(file_document, 12);
 
 /**
  * @generated from enum doc.NodeType
@@ -390,6 +467,11 @@ export enum NodeType {
    * @generated from enum value: NODE_LINE_BREAK = 12;
    */
   NODE_LINE_BREAK = 12,
+
+  /**
+   * @generated from enum value: NODE_COMMENT = 13;
+   */
+  NODE_COMMENT = 13,
 }
 
 /**
@@ -512,7 +594,15 @@ export const DocumentSaveService: GenService<{
    */
   save: {
     methodKind: "unary";
-    input: typeof DocumentSchema;
+    input: typeof CreateDocumetnRequestSchema;
+    output: typeof DocumentRequestSchema;
+  },
+  /**
+   * @generated from rpc doc.DocumentSaveService.Edit
+   */
+  edit: {
+    methodKind: "unary";
+    input: typeof EditDocumentRequestSchema;
     output: typeof DocumentRequestSchema;
   },
 }> = /*@__PURE__*/

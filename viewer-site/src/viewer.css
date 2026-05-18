@@ -1,0 +1,253 @@
+/* ════════════════════════════════════════════════════════
+   viewer.css — стили оболочки и панели настроек.
+   Стили контента (.vv-root и т.д.) генерятся в render.ts
+   через injectViewerStyles() и используют CSS-переменные.
+   ════════════════════════════════════════════════════════ */
+
+/* ── Сброс body (убирает белые края) ────────────────── */
+html,
+body {
+    margin: 0;
+    padding: 0;
+    background: var(--vv-page-bg, #1b1f2a);
+    font-family: "Tilda Sans", sans-serif;
+}
+
+/* ── App Shell ──────────────────────────────────────── */
+
+.viewer-app {
+    min-height: 100vh;
+    background: var(--vv-page-bg, #1b1f2a);
+    color: var(--vv-text, #e2e4ed);
+    padding-top: 16px;
+}
+
+/* ── Top bar (показывается при наведении к верхнему краю) ── */
+
+.top-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 20;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 0 16px;
+    background: var(--vv-header-bg, #222535);
+    border-bottom: 1px solid var(--vv-header-border, #2a2d3e);
+    opacity: 0;
+    transform: translateY(-100%);
+    transition:
+        opacity 200ms ease,
+        transform 200ms ease;
+    pointer-events: none;
+}
+
+.top-bar--visible {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+.top-bar__id {
+    font-size: 0.8rem;
+    color: var(--vv-muted, #6b7280);
+    font-family: "Tilda Sans", sans-serif;
+    flex: 1;
+}
+
+.top-bar__btn {
+    padding: 4px 10px;
+    border-radius: 6px;
+    border: 1px solid var(--vv-header-border, #2a2d3e);
+    background: transparent;
+    color: var(--vv-text, #e2e4ed);
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 150ms ease;
+    line-height: 1;
+}
+
+.top-bar__btn:hover {
+    background: rgba(255, 255, 255, 0.06);
+}
+
+/* ── Error ─────────────────────────────────────────── */
+
+.viewer-error {
+    width: 100%;
+    padding: 8px 12px;
+    background: rgba(239, 68, 68, 0.12);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    border-radius: 8px;
+    color: #ef4444;
+    font-size: 0.85rem;
+}
+
+.viewer-main {
+    padding: 20px 20px 80px;
+    margin: 0 auto;
+    /* maxWidth задаётся инлайн-стилем из settings.store */
+}
+
+.viewer-placeholder {
+    text-align: center;
+    color: var(--vv-muted, #6b7280);
+    padding: 60px 20px;
+    font-size: 1rem;
+    line-height: 1.6;
+}
+
+.viewer-loading {
+    text-align: center;
+    color: var(--vv-muted, #6b7280);
+    padding: 60px 20px;
+    font-size: 1rem;
+}
+
+/* ── Settings Panel ─────────────────────────────────── */
+
+.settings-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 100;
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-end;
+}
+
+.settings-panel {
+    background: var(--vv-header-bg, #222535);
+    border-left: 1px solid var(--vv-header-border, #2a2d3e);
+    width: 340px;
+    max-width: 100vw;
+    height: 100vh;
+    overflow-y: auto;
+    padding: 24px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    animation: slideIn 200ms ease;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+    }
+    to {
+        transform: translateX(0);
+    }
+}
+
+.settings-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.settings-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--vv-text, #e2e4ed);
+    margin: 0;
+}
+
+.settings-close {
+    padding: 4px 8px;
+    border-radius: 6px;
+    border: 1px solid var(--vv-header-border, #2a2d3e);
+    background: transparent;
+    color: var(--vv-text, #e2e4ed);
+    cursor: pointer;
+    font-size: 1rem;
+    line-height: 1;
+}
+
+.settings-close:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.settings-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.settings-label {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--vv-muted, #6b7280);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.settings-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.settings-input {
+    flex: 1;
+    padding: 7px 10px;
+    border-radius: 6px;
+    border: 1px solid var(--vv-header-border, #2a2d3e);
+    background: var(--vv-page-bg, #1b1f2a);
+    color: var(--vv-text, #e2e4ed);
+    font-size: 0.85rem;
+    font-family: inherit;
+    outline: none;
+}
+
+.settings-input:focus {
+    border-color: var(--vv-link, #4f46e5);
+}
+
+.settings-color {
+    width: 36px;
+    height: 32px;
+    padding: 2px;
+    border-radius: 6px;
+    border: 1px solid var(--vv-header-border, #2a2d3e);
+    background: var(--vv-page-bg, #1b1f2a);
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.settings-color::-webkit-color-swatch-wrapper {
+    padding: 0;
+}
+
+.settings-color::-webkit-color-swatch {
+    border-radius: 4px;
+    border: none;
+}
+
+.settings-divider {
+    border: none;
+    border-top: 1px solid var(--vv-header-border, #2a2d3e);
+    margin: 4px 0;
+}
+
+.settings-reset {
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: 1px solid var(--vv-header-border, #2a2d3e);
+    background: transparent;
+    color: var(--vv-muted, #6b7280);
+    font-size: 0.85rem;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 150ms ease;
+    width: 100%;
+}
+
+.settings-reset:hover {
+    color: #ef4444;
+    border-color: rgba(239, 68, 68, 0.3);
+}

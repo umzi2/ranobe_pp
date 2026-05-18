@@ -14,6 +14,7 @@ enum NodeType {
   NODE_LIST_ITEM = 10;
   NODE_LINK = 11;
   NODE_LINE_BREAK = 12;
+  NODE_COMMENT = 13;
 }
 
 enum HeadingTag {
@@ -54,7 +55,12 @@ message Node {
     HeadingData heading = 12;
     ListData list = 13;
     LinkData link = 14;
+    CommentData comment = 15;
   }
+}
+
+message CommentData {
+  string comment_text = 1;
 }
 
 message TextData {
@@ -96,11 +102,22 @@ message DocumentRequest {
 message AWSPutRequest{
     int32 team_id = 1;
     int32 title_id = 2;
-    int32 chapter_id = 3; 
+    int32 chapter_id = 3;
+    string api_key=4;
 }
 message AWSPutResponse{
     string url = 1;
     string id = 2;
+    
+}
+message CreateDocumetnRequest{
+    string api_key=1;
+    Document document = 2;
+}
+message EditDocumentRequest{
+    int64 id = 1;
+    Document document = 2;
+     string api_key=3;
 }
 service DocumentReadService {
   rpc Read(DocumentRequest) returns (Document);
@@ -108,5 +125,6 @@ service DocumentReadService {
 }
 
 service DocumentSaveService {
-  rpc Save(Document) returns (DocumentRequest);
+  rpc Save(CreateDocumetnRequest) returns (DocumentRequest);
+  rpc Edit(EditDocumentRequest) returns (DocumentRequest);
 }

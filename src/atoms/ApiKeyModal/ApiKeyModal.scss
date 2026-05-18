@@ -1,0 +1,110 @@
+.ApiKeyModal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+
+  &--open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
+
+.ApiKeyModal {
+  background: #1e1e2e;
+  border: 1px solid #3b3b5c;
+  border-radius: 12px;
+  padding: 2rem;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
+  color: #cdd6f4;
+
+  &__title {
+    margin: 0 0 0.5rem;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #f5f5f5;
+  }
+
+  &__desc {
+    margin: 0 0 1.25rem;
+    font-size: 0.875rem;
+    color: #a6adc8;
+    line-height: 1.5;
+  }
+
+  &__form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  &__input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid #45475a;
+    border-radius: 8px;
+    background: #181825;
+    color: #cdd6f4;
+    font-size: 0.95rem;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.2s;
+    box-sizing: border-box;
+
+    &::placeholder {
+      color: #6c7086;
+    }
+
+    &:focus {
+      border-color: #cba6f7;
+    }
+  }
+
+  &__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+  }
+
+  &__btn {
+    padding: 0.6rem 1.25rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.2s, opacity 0.2s;
+
+    &--cancel {
+      background: #45475a;
+      color: #cdd6f4;
+
+      &:hover {
+        background: #585b70;
+      }
+    }
+
+    &--submit {
+      background: #cba6f7;
+      color: #1e1e2e;
+
+      &:hover {
+        background: #b4befe;
+      }
+
+      &:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+      }
+    }
+  }
+}

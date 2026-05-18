@@ -2,6 +2,7 @@ import { MetaProvider, Title } from "@solidjs/meta";
 import { Router } from "@solidjs/router";
 import { FileRoutes } from "@solidjs/start/router";
 import { Suspense } from "solid-js";
+import { ApiKeyModal } from "~/atoms/ApiKeyModal/ApiKeyModal";
 import "./app.scss";
 
 export default function App() {
@@ -11,6 +12,7 @@ export default function App() {
         <MetaProvider>
           <Title>Ranobe PP</Title>
           <Suspense>{props.children}</Suspense>
+          <ApiKeyModal />
         </MetaProvider>
       )}
     >

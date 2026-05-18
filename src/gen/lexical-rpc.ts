@@ -3,11 +3,13 @@
 // ──────────────────────────────────────────────────────────
 
 import type { LexicalEditor } from "lexical";
-import { toBinary } from "@bufbuild/protobuf";
-import { createClient } from "@connectrpc/connect";
+import { create, toBinary } from "@bufbuild/protobuf";
+import { createClient, ConnectError, Code } from "@connectrpc/connect";
 import { createConnectTransport } from "@connectrpc/connect-web";
 import {
   DocumentSchema,
+  CreateDocumetnRequestSchema,
+  EditDocumentRequestSchema,
   DocumentSaveService,
   DocumentReadService,
   type Document,
@@ -18,12 +20,16 @@ import {
   documentToLexical,
   type LexicalNode,
 } from "~/services/lexical-proto";
+import { resolveApiKey, clearStoredApiKey } from "~/services/api-key";
 
 export type { Document };
 
 // ──────────────────────────────────────────────────────────
 
-const BACKEND = "http://localhost:8080";
+const BACKEND =
+  (typeof import.meta !== "undefined" &&
+    (import.meta as any).env?.VITE_BACKEND_URL) ||
+  "http://localhost:8080";
 
 let _transport: ReturnType<typeof createConnectTransport> | undefined;
 
@@ -48,6 +54,7 @@ export function editorToDocument(editor: LexicalEditor): Document {
 }
 
 export async function saveEditor(editor: LexicalEditor): Promise<bigint> {
+  const apiKey = await resolveApiKey();
   const doc = editorToDocument(editor);
 
   console.group("%c📤 Connect RPC saveEditor", "color:#34d399;font-weight:600");
@@ -55,13 +62,53 @@ export async function saveEditor(editor: LexicalEditor): Promise<bigint> {
   console.log("Binary:", toBinary(DocumentSchema, doc));
 
   try {
-    const res = await saveClient.save(doc);
+    const req = create(CreateDocumetnRequestSchema, {
+      apiKey,
+      document: doc,
+    });
+    const res = await saveClient.save(req);
     console.log("Response id:", res.id);
     console.groupEnd();
     return res.id;
   } catch (err) {
     console.error("Save failed:", err);
     console.groupEnd();
+    if (isAuthError(err)) {
+      clearStoredApiKey();
+    }
+    throw err;
+  }
+}
+
+export async function editEditor(
+  editor: LexicalEditor,
+  id: bigint,
+): Promise<bigint> {
+  const apiKey = await resolveApiKey();
+  const doc = editorToDocument(editor);
+
+  console.group("%c📝 Connect RPC editEditor", "color:#f59e0b;font-weight:600");
+  console.log("id:", id, "Document:", doc);
+  console.log("Binary:", toBinary(DocumentSchema, doc));
+
+  try {
+    console.log("[editEditor] saveClient.edit:", typeof saveClient.edit);
+    const editReq = create(EditDocumentRequestSchema, {
+      id,
+      document: doc,
+      apiKey,
+    });
+    console.log("[editEditor] editReq:", editReq);
+    const res = await saveClient.edit(editReq);
+    console.log("Response id:", res.id);
+    console.groupEnd();
+    return res.id;
+  } catch (err) {
+    console.error("Edit failed:", err);
+    console.groupEnd();
+    if (isAuthError(err)) {
+      clearStoredApiKey();
+    }
     throw err;
   }
 }
@@ -87,6 +134,8 @@ export async function getAwsUrl(
   titleId: number,
   chapterId: number,
 ): Promise<AWSPutResponse> {
+  const apiKey = await resolveApiKey();
+
   console.group("%c☁️ Connect RPC getAwsUrl", "color:#60a5fa;font-weight:600");
   console.log("team:", teamId, "title:", titleId, "chapter:", chapterId);
 
@@ -95,6 +144,7 @@ export async function getAwsUrl(
       teamId,
       titleId,
       chapterId,
+      apiKey,
     });
     console.log("Response:", res);
     console.groupEnd();
@@ -102,6 +152,26 @@ export async function getAwsUrl(
   } catch (err) {
     console.error("GetAws failed:", err);
     console.groupEnd();
+    if (isAuthError(err)) {
+      clearStoredApiKey();
+    }
     throw err;
   }
+}
+
+// ──────────────────────────────────────────────────────────
+// Helpers
+// ──────────────────────────────────────────────────────────
+
+/**
+ * Returns true if the error indicates an authentication/authorization
+ * problem (e.g. invalid or missing API key).
+ */
+function isAuthError(err: unknown): boolean {
+  if (err instanceof ConnectError) {
+    return (
+      err.code === Code.Unauthenticated || err.code === Code.PermissionDenied
+    );
+  }
+  return false;
 }
