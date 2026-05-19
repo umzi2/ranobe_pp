@@ -8,5 +8,21 @@ export default defineConfig({
   },
   build: {
     target: "esnext",
+    cssMinify: true,
+    minify: "esbuild",
+    sourcemap: false,
+    reportCompressedSize: false,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          solid: ["solid-js"],
+          proto: [
+            "@bufbuild/protobuf",
+            "@connectrpc/connect",
+            "@connectrpc/connect-web",
+          ],
+        },
+      },
+    },
   },
 });

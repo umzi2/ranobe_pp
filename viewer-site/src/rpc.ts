@@ -48,9 +48,9 @@ export const readClient = createClient(DocumentReadService, getTransport());
  * Загружает документ по ID.
  */
 export async function loadDocument(id: bigint): Promise<Document> {
-  console.log("[viewer] Loading document:", id);
+  // console.log("[viewer] Loading document:", id);
   const doc = await readClient.read({ id });
-  console.log("[viewer] Loaded:", doc);
+  // console.log("[viewer] Loaded:", doc);
   return doc;
 }
 

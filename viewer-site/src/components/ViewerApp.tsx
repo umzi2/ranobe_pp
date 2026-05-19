@@ -6,7 +6,6 @@
 // Кнопка настроек — справа снизу, прячется при скролле вниз.
 // ──────────────────────────────────────────────────────────
 
-import { useParams } from "@solidjs/router";
 import { createSignal, createEffect, onMount, onCleanup } from "solid-js";
 import { settings } from "../store/settings";
 import { injectViewerStyles } from "../render";
@@ -16,9 +15,7 @@ import { renderDocument, initViewerComments } from "../render";
 import { SettingsPanel } from "./SettingsPanel";
 import "../viewer.css";
 
-export function ViewerApp() {
-  const params = useParams<{ id?: string }>();
-
+export function ViewerApp(props: { docId?: string }) {
   const [html, setHtml] = createSignal<string | null>(null);
   const [loading, setLoading] = createSignal(false);
   const [error, setError] = createSignal<string | null>(null);
@@ -84,7 +81,7 @@ export function ViewerApp() {
 
   // Автозагрузка при изменении id в URL
   createEffect(() => {
-    const id = params.id;
+    const id = props.docId;
     if (id) {
       loadDoc(id);
     } else {
