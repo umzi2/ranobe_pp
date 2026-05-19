@@ -261,6 +261,26 @@ export const Toolbar = (props: { docId?: bigint }) => {
     setShowCommentInput(false);
   }
 
+  /** Remove the CommentNode the cursor is inside */
+  function removeComment() {
+    editor.update(() => {
+      const sel = $getSelection();
+      if (!$isRangeSelection(sel)) return;
+      const anchor = sel.anchor.getNode();
+      const node = $isCommentNode(anchor) ? anchor : anchor.getParent();
+      if (!$isCommentNode(node)) return;
+
+      const text = node.getTextContent();
+      const parent = node.getParentOrThrow();
+      const idx = parent.getChildren().findIndex((c) => c.__key === node.__key);
+      if (idx === -1) return;
+
+      const textNode = $createTextNode(text);
+      parent.splice(idx, 1, [textNode]);
+      textNode.select();
+    });
+  }
+
   // (delete is handled in the inline block toolbar)
 
   const textActions: TextAction[] = [
@@ -378,6 +398,11 @@ export const Toolbar = (props: { docId?: bigint }) => {
           <ToggleButton
             pressed={isInLink()}
             onChange={(v) => {
+              if (isInLink() && !v) {
+                // Уже внутри ссылки → снять ссылку
+                editor.dispatchCommand(TOGGLE_LINK_COMMAND, null);
+                return;
+              }
               setShowLinkInput(v);
               if (!v) setLinkUrl("");
             }}
@@ -433,6 +458,11 @@ export const Toolbar = (props: { docId?: bigint }) => {
           <ToggleButton
             pressed={isInComment()}
             onChange={(v) => {
+              if (isInComment() && !v) {
+                // Уже внутри комментария → удалить
+                removeComment();
+                return;
+              }
               setShowCommentInput(v);
               if (!v) setCommentText("");
             }}

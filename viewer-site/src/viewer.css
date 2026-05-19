@@ -19,60 +19,48 @@ body {
     min-height: 100vh;
     background: var(--vv-page-bg, #1b1f2a);
     color: var(--vv-text, #e2e4ed);
-    padding-top: 16px;
+    /*padding-top: 16px;*/
 }
 
-/* ── Top bar (показывается при наведении к верхнему краю) ── */
+@media (max-width: 600px) {
+    .viewer-app {
+        padding-top: 0;
+    }
+}
 
-.top-bar {
+/* ── Floating settings button ── */
+
+.floating-settings {
     position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 20;
-    height: 36px;
+    bottom: 20px;
+    right: 16px;
+    z-index: 30;
+    width: 40px;
+    height: 40px;
     display: flex;
     align-items: center;
-    justify-content: flex-end;
-    gap: 10px;
-    padding: 0 16px;
-    background: var(--vv-header-bg, #222535);
-    border-bottom: 1px solid var(--vv-header-border, #2a2d3e);
-    opacity: 0;
-    transform: translateY(-100%);
-    transition:
-        opacity 200ms ease,
-        transform 200ms ease;
-    pointer-events: none;
-}
-
-.top-bar--visible {
-    opacity: 1;
-    transform: translateY(0);
-    pointer-events: auto;
-}
-
-.top-bar__id {
-    font-size: 0.8rem;
-    color: var(--vv-muted, #6b7280);
-    font-family: "Tilda Sans", sans-serif;
-    flex: 1;
-}
-
-.top-bar__btn {
-    padding: 4px 10px;
-    border-radius: 6px;
+    justify-content: center;
+    border-radius: 50%;
     border: 1px solid var(--vv-header-border, #2a2d3e);
-    background: transparent;
+    background: var(--vv-header-bg, #222535);
     color: var(--vv-text, #e2e4ed);
-    font-size: 1rem;
+    font-size: 1.2rem;
     cursor: pointer;
-    transition: background 150ms ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    transition:
+        opacity 250ms ease,
+        transform 150ms ease,
+        background 150ms ease;
     line-height: 1;
 }
 
-.top-bar__btn:hover {
-    background: rgba(255, 255, 255, 0.06);
+.floating-settings:active {
+    transform: scale(0.92);
+}
+
+.floating-settings--hidden {
+    opacity: 0;
+    pointer-events: none;
 }
 
 /* ── Error ─────────────────────────────────────────── */
@@ -88,9 +76,15 @@ body {
 }
 
 .viewer-main {
-    padding: 20px 20px 80px;
+    padding: 0px 20px 0px;
     margin: 0 auto;
     /* maxWidth задаётся инлайн-стилем из settings.store */
+}
+
+@media (max-width: 600px) {
+    .viewer-main {
+        padding: 0 0 60px;
+    }
 }
 
 .viewer-placeholder {

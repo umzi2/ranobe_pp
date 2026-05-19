@@ -157,8 +157,9 @@ export async function uploadImageToCdn(
       console.error("Upload failed:", err);
       // Remove the orphan ImageNode — the upload never completed
       if (nodeKey) {
+        const key = nodeKey;
         editor.update(() => {
-          const n = $getNodeByKey(nodeKey);
+          const n = $getNodeByKey(key);
           if (n) {
             const next = n.getNextSibling();
             n.remove();

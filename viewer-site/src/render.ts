@@ -99,6 +99,14 @@ function getInlineCSS(): string {
     border-radius: 12px;
     word-break: break-word;
 }
+
+/* ── Mobile: убираем портал, уменьшаем паддинги ── */
+@media (max-width: 600px) {
+    .vv-root {
+        border-radius: 0;
+        padding: 16px 16px 60px 16px;
+    }
+}
 .vv-root *,
 .vv-root *::before,
 .vv-root *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -222,6 +230,66 @@ function getInlineCSS(): string {
     color: var(--vv-comment, #e5c07b);
     cursor: pointer;
     border-bottom: 1px dotted var(--vv-comment, #e5c07b);
+}
+
+/* ── Комментарий: поповер ── */
+.vv-comment-popup {
+    position: fixed;
+    z-index: 9999;
+    background: var(--vv-page-bg, #343c52);
+    color: var(--vv-text, #e2e4ed);
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    max-width: 280px;
+    width: auto;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    box-shadow: 0 10px 15px -3px rgba(0,0,0,0.5);
+    line-height: 1.5;
+    pointer-events: auto;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+}
+.vv-comment-popup--visible {
+    opacity: 1;
+}
+.vv-comment-popup-arrow {
+    position: absolute;
+    bottom: -6px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 6px solid var(--vv-page-bg, #343c52);
+}
+.vv-comment-popup--below .vv-comment-popup-arrow {
+    top: -6px;
+    bottom: auto;
+    border-top: none;
+    border-bottom: 6px solid var(--vv-page-bg, #343c52);
+}
+.vv-comment-popup-text {
+    display: block;
+    margin-right: 20px;
+}
+.vv-comment-popup-close {
+    position: absolute;
+    top: 4px;
+    right: 8px;
+    background: none;
+    border: none;
+    color: var(--vv-muted, #6b7280);
+    cursor: pointer;
+    font-size: 14px;
+    padding: 0;
+    line-height: 1;
+}
+.vv-comment-popup-close:hover {
+    color: var(--vv-text, #e2e4ed);
 }
 `.trim();
 }
@@ -384,9 +452,9 @@ function renderList(node: ViewerNode): string {
 
 function renderComment(node: ViewerNode): string {
   const data = node.data.case === "comment" ? node.data.value : null;
-  const title = data ? escapeAttr(data.commentText) : "";
+  const text = data ? escapeAttr(data.commentText) : "";
   const inner = renderInlineChildren(node);
-  return `<span class="vv-comment" title="${title}">${inner}</span>`;
+  return `<span class="vv-comment" data-comment-text="${text}">${inner}</span>`;
 }
 
 function renderLink(node: ViewerNode): string {
@@ -466,4 +534,147 @@ function escapeAttr(str: string): string {
     .replace(/'/g, "&#039;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;");
+}
+
+// ──────────────────────────────────────────────────────────
+// Comment interactivity (click to show popover)
+// ──────────────────────────────────────────────────────────
+
+/**
+ * Активирует клик/тап по комментариям во вьювере.
+ * Вызвать один раз после того, как HTML вставлен в DOM.
+ *
+ * Пример:
+ *   const html = renderDocument(doc);
+ *   document.getElementById("viewer")!.innerHTML = html;
+ *   initViewerComments();
+ */
+export function initViewerComments(): void {
+  if (typeof document === "undefined") return;
+
+  let activePopup: HTMLElement | null = null;
+  let outsideHandler: ((e: Event) => void) | null = null;
+
+  function hidePopup() {
+    if (activePopup) {
+      activePopup.remove();
+      activePopup = null;
+    }
+    if (outsideHandler) {
+      document.removeEventListener("click", outsideHandler);
+      document.removeEventListener("touchstart", outsideHandler);
+      outsideHandler = null;
+    }
+  }
+
+  /** Open popup for a comment element */
+  function openPopup(el: HTMLElement) {
+    // Hide any previously open popup
+    hidePopup();
+
+    const text = el.getAttribute("data-comment-text") || "(no text)";
+
+    // Create popup
+    const popup = document.createElement("div");
+    popup.className = "vv-comment-popup";
+
+    const textEl = document.createElement("span");
+    textEl.className = "vv-comment-popup-text";
+    textEl.textContent = text;
+    popup.appendChild(textEl);
+
+    const arrow = document.createElement("div");
+    arrow.className = "vv-comment-popup-arrow";
+    popup.appendChild(arrow);
+
+    const close = document.createElement("button");
+    close.className = "vv-comment-popup-close";
+    close.textContent = "\u2715";
+    close.addEventListener("click", (ce) => {
+      ce.stopPropagation();
+      hidePopup();
+    });
+    popup.appendChild(close);
+
+    document.body.appendChild(popup);
+    activePopup = popup;
+
+    // Smart position
+    const rect = el.getBoundingClientRect();
+    const viewportW = window.innerWidth;
+    const viewportH = window.innerHeight;
+    const gap = 8;
+
+    const maxW = Math.min(280, viewportW - 32);
+    popup.style.maxWidth = `${maxW}px`;
+
+    const popupH = popup.offsetHeight;
+    const popupW = popup.offsetWidth;
+
+    // Horizontal: center, clamped to viewport
+    let left = rect.left + rect.width / 2 - popupW / 2;
+    left = Math.max(8, Math.min(left, viewportW - popupW - 8));
+    popup.style.left = `${left}px`;
+
+    // Vertical: prefer above, flip to below if not enough space
+    const spaceAbove = rect.top - gap;
+    const spaceBelow = viewportH - rect.bottom - gap;
+    const needed = popupH + gap;
+
+    if (spaceAbove >= needed) {
+      popup.style.top = `${rect.top - gap}px`;
+      popup.style.transform = "translateY(-100%)";
+      popup.classList.remove("vv-comment-popup--below");
+    } else if (spaceBelow >= needed) {
+      popup.style.top = `${rect.bottom + gap}px`;
+      popup.style.transform = "none";
+      popup.classList.add("vv-comment-popup--below");
+    } else {
+      // Not enough space either way — above anyway
+      popup.style.top = `${rect.top - gap}px`;
+      popup.style.transform = "translateY(-100%)";
+      popup.classList.remove("vv-comment-popup--below");
+    }
+
+    // Fade in
+    requestAnimationFrame(() => {
+      popup.classList.add("vv-comment-popup--visible");
+    });
+
+    // Click outside handler
+    const onOutside = (oe: Event) => {
+      const target = oe.target as Node;
+      if (target === el || target === popup || popup.contains(target)) return;
+      hidePopup();
+    };
+    outsideHandler = onOutside;
+    setTimeout(() => {
+      document.addEventListener("click", onOutside);
+      document.addEventListener("touchstart", onOutside);
+    }, 0);
+  }
+
+  document.querySelectorAll<HTMLElement>(".vv-comment").forEach((el) => {
+    // Touch: immediate open (no 300ms delay)
+    el.addEventListener(
+      "touchstart",
+      (e: TouchEvent) => {
+        // Mark that touch opened it, so click doesn't re-open
+        (el as any)._vvCommentOpened = true;
+        openPopup(el);
+      },
+      { passive: true },
+    );
+
+    // Click: for desktop mouse
+    el.addEventListener("click", (e: MouseEvent) => {
+      // If touchstart already opened it, skip
+      if ((el as any)._vvCommentOpened) {
+        (el as any)._vvCommentOpened = false;
+        return;
+      }
+      e.preventDefault();
+      openPopup(el);
+    });
+  });
 }

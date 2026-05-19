@@ -52,7 +52,6 @@ function ChapterEditor({ id }: { id: bigint }) {
           onSave={handleSave}
         />
       </EditorLayout>
-      <ProtoPreview />
     </>
   );
 }

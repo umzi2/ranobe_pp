@@ -3,7 +3,7 @@
 //
 // Применяет CSS-переменные из settings.store на :root,
 // управляет состоянием загрузки/ошибки документа.
-// Верхняя панель появляется только при наведении к верхнему краю.
+// Кнопка настроек — справа снизу, прячется при скролле вниз.
 // ──────────────────────────────────────────────────────────
 
 import { useParams } from "@solidjs/router";
@@ -12,7 +12,7 @@ import { settings } from "../store/settings";
 import { injectViewerStyles } from "../render";
 import { loadDocument } from "../rpc";
 import type { ViewerDocument } from "../types";
-import { renderDocument } from "../render";
+import { renderDocument, initViewerComments } from "../render";
 import { SettingsPanel } from "./SettingsPanel";
 import "../viewer.css";
 
@@ -23,36 +23,11 @@ export function ViewerApp() {
   const [loading, setLoading] = createSignal(false);
   const [error, setError] = createSignal<string | null>(null);
   const [settingsOpen, setSettingsOpen] = createSignal(false);
-  const [topBarVisible, setTopBarVisible] = createSignal(false);
 
   // ── Стили вьювера ──────────────────────────────────
 
   onMount(() => {
     injectViewerStyles();
-  });
-
-  // ── Детект мыши у верхнего края ────────────────────
-
-  let nearTimer: ReturnType<typeof setTimeout> | undefined;
-
-  function onMouseMove(e: MouseEvent) {
-    // Показываем полоску когда мышь в верхних 40px экрана
-    if (e.clientY <= 40) {
-      setTopBarVisible(true);
-      clearTimeout(nearTimer);
-    } else if (topBarVisible()) {
-      // Скрываем с небольшой задержкой
-      clearTimeout(nearTimer);
-      nearTimer = setTimeout(() => setTopBarVisible(false), 600);
-    }
-  }
-
-  onMount(() => {
-    window.addEventListener("mousemove", onMouseMove, { passive: true });
-    onCleanup(() => {
-      window.removeEventListener("mousemove", onMouseMove);
-      clearTimeout(nearTimer);
-    });
   });
 
   // ── CSS-переменные из настроек ─────────────────────
@@ -118,24 +93,21 @@ export function ViewerApp() {
     }
   });
 
+  // ── Активация комментариев после рендера ────────────
+
+  createEffect(() => {
+    const h = html();
+    if (h) {
+      requestAnimationFrame(() => {
+        initViewerComments();
+      });
+    }
+  });
+
   // ── Render ─────────────────────────────────────────
 
   return (
     <div class="viewer-app" style={cssVars()}>
-      {/* Верхняя полоска — показывается при наведении */}
-      <div class="top-bar" classList={{ "top-bar--visible": topBarVisible() }}>
-        <span class="top-bar__id">
-          {params.id ? `#${params.id}` : "No document"}
-        </span>
-        <button
-          class="top-bar__btn"
-          onClick={() => setSettingsOpen(true)}
-          title="Settings"
-        >
-          ⚙
-        </button>
-      </div>
-
       {error() && <div class="viewer-error">{error()}</div>}
 
       <main
@@ -153,10 +125,61 @@ export function ViewerApp() {
         )}
       </main>
 
+      {/* Кнопка настроек справа снизу — прячется при скролле вниз */}
+      <FloatingSettingsButton
+        onOpen={() => setSettingsOpen(true)}
+        settingsOpen={settingsOpen()}
+      />
+
       {settingsOpen() && (
         <SettingsPanel onClose={() => setSettingsOpen(false)} />
       )}
     </div>
+  );
+}
+
+// ── Floating settings button ───────────────────────────
+// Прячется при скролле вниз, появляется при скролле вверх
+
+function FloatingSettingsButton(props: {
+  onOpen: () => void;
+  settingsOpen: boolean;
+}) {
+  const [visible, setVisible] = createSignal(true);
+
+  onMount(() => {
+    let lastScrollY = window.scrollY;
+
+    function onScroll() {
+      const currentScrollY = window.scrollY;
+
+      if (currentScrollY > lastScrollY && currentScrollY > 20) {
+        // Скроллим вниз и ниже 20px — прячем
+        setVisible(false);
+      } else if (currentScrollY < lastScrollY) {
+        // Скроллим вверх — показываем
+        setVisible(true);
+      }
+
+      lastScrollY = currentScrollY;
+    }
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onCleanup(() => window.removeEventListener("scroll", onScroll));
+  });
+
+  return (
+    <button
+      class="floating-settings"
+      classList={{
+        "floating-settings--hidden": !visible() || props.settingsOpen,
+      }}
+      onClick={props.onOpen}
+      title="Settings"
+      aria-label="Settings"
+    >
+      ⚙
+    </button>
   );
 }
 
